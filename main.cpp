@@ -84,7 +84,7 @@ int main(int argc, char *argv[]) {
     if (from_camera) {
         MVS_cap.Init(); // 初始化海康相机
     } else {
-        video = new VideoWrapper(PROJECT_DIR"/videoTest/energy_red.mp4"); // 视频文件路径
+        video = new VideoWrapper(PROJECT_DIR"/videoTest/armor_red.mp4"); // 视频文件路径
         if (video->init()) {
             LOGM("video_source initialization successfully.");
         } else {
@@ -105,7 +105,7 @@ int main(int argc, char *argv[]) {
 
 
 //        char curr_state = mcu_data.state; // # TODO:记得改回来！
-        char curr_state = BIG_ENERGY_STATE;
+        char curr_state = ARMOR_STATE;
         CNT_TIME("Total", {
             if (curr_state != ARMOR_STATE) {  // 能量机关模式
                 if (last_state == ARMOR_STATE) {//若上一帧不是大能量机关模式，即刚往完成切换，则需要初始化

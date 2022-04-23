@@ -37,10 +37,7 @@ vector<double> ArmorFinder::none_predict_run(){
     double dx = rect.x + rect.width / 2 - IMAGE_CENTER_X;
     double dy = rect.y + rect.height / 2 - IMAGE_CENTER_Y;
     double yaw = atan(dx / FOCUS_PIXAL) * 180 / PI;
-//   yaw -= 0.3;  //消除摩擦轮不同步导致的弹道偏移
     double pitch = atan(dy / FOCUS_PIXAL) * 180 / PI;
-    pitch = pitch - atan(400000/DISTANCE_HEIGHT)-2;  // 消除相机与枪口的误差,相机在枪口线上0.04m,数值对应0.04*10000  == 40000  //1.4
-    //cout<<"转换前的pitch:"<<pitch << "转换后的pitch:"<< pitch1 << endl;
     double dist = DISTANCE_HEIGHT / rect.height;
 
     return vector<double>{yaw, pitch, dist};
