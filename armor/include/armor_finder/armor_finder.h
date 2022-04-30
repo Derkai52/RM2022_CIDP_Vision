@@ -129,7 +129,7 @@ private:
 
     bool sendBoxPosition(uint16_t shoot);               // 和主控板通讯
     vector<double> none_predict_run();                  // 普通模式（不加预测，用于测试电控）
-    bool predict_run(int ave_cal_time);                 // 预测模式
+    bool predict_run(double ave_cal_time);              // 预测模式
 
 public:
     void run(cv::Mat &src);                             // 自瞄主函数

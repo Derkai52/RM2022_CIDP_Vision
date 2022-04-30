@@ -34,6 +34,7 @@ std::map<std::string, std::pair<std::string, void(*)(void)>> options = {
     {"--show-armor-box", {
         "show the aim box.", []() {
             show_armor_box = true;
+            armor_predictor = true;
             LOGM("Enable show armor box");
         }
     }},

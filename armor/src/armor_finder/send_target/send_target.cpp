@@ -43,7 +43,7 @@ vector<double> ArmorFinder::none_predict_run(){
     return vector<double>{yaw, pitch, dist};
 }
 
-bool ArmorFinder::predict_run(int ave_cal_time) {
+bool ArmorFinder::predict_run(double ave_cal_time) {
 //    if (target_box.light_blobs.size()==2)
     cv::Point lt = cv::Point(target_box.light_blobs[0].rect.center.x, target_box.light_blobs[0].rect.center.y - target_box.light_blobs[0].length*0.5);
     cv::Point lb = cv::Point(target_box.light_blobs[0].rect.center.x, target_box.light_blobs[0].rect.center.y + target_box.light_blobs[0].length*0.5);
@@ -62,7 +62,7 @@ bool ArmorFinder::predict_run(int ave_cal_time) {
     const cv::Point2f armor_box_points[4]{lt, lb, rb, rt};
 
     cv::Mat im2show = ori_src;
-    bool ok = predictor.predict(armor_box_points, ave_cal_time , im2show);
+    bool ok = predictor.predict(armor_box_points, target_box.id, ave_cal_time, im2show);
     if(!ok) {
         cout << "预测失败,按未预测输出" << endl;
         return false;
@@ -71,7 +71,8 @@ bool ArmorFinder::predict_run(int ave_cal_time) {
 }
 
 
-int ave_cal_time = 10; // 程序耗时（采样间隔1000ms）
+int ave_cal_time = 10; // 打印发送帧率 （采样间隔1000ms）
+double consume_time = 10;  // 程序耗时
 bool ArmorFinder::sendBoxPosition(uint16_t shoot_delay) {
     bool ok = false;
     if (target_box.rect == cv::Rect2d()) return false;
@@ -83,10 +84,12 @@ bool ArmorFinder::sendBoxPosition(uint16_t shoot_delay) {
         static time_t last_time = time(nullptr);
         static int fps;
         time_t t = time(nullptr);
-        if (last_time != t) {
+
+    if (last_time != t) {
             last_time = t;
             cout << "识别到装甲板: 发送帧率:" << fps << endl;
             ave_cal_time = (int)1000/fps;
+            consume_time = (double)t;
             fps = 0;
         }
         fps += 1;
@@ -96,7 +99,6 @@ bool ArmorFinder::sendBoxPosition(uint16_t shoot_delay) {
     double yaw;   // 发送给电控yaw角度
     double pitch; // 发送给电控pitch角度
     double dist;  // 发送给电控dist目标距离
-//    armor_predictor = true;
     if(!armor_predictor){ // 不使用预测模式（可用于测试电控）
         auto result = ArmorFinder::none_predict_run();
         yaw = result[0];
@@ -106,6 +108,6 @@ bool ArmorFinder::sendBoxPosition(uint16_t shoot_delay) {
         return sendTarget(serial, yaw, -pitch, dist, shoot_delay);
     }
     else{
-        ArmorFinder::predict_run(ave_cal_time);
+        ArmorFinder::predict_run(0.3);
     }
 }

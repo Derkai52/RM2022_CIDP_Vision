@@ -24,7 +24,8 @@ void Energy::getAimPoint(cv::Point target_point_) {
         extra_delta_x = 0;
         extra_delta_y = 0;
     }
-
+//    cout << "extra_delta_x:" << extra_delta_x << "extra_delta_y:" << extra_delta_y <<endl;
+    cout << "extra_delta_x:" << target_polar_angle_<<endl;
     int compensate_yaw = 0, compensate_pitch = 0;
     if (mcu_data.enemy_color == ENEMY_BLUE) {
         compensate_yaw = RED_COMPENSATE_YAW;

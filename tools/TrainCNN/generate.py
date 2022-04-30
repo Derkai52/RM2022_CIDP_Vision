@@ -36,8 +36,8 @@ class DataSet:
 
     def generate_data_sets(self, folder):
         sets = []
-        for i in range(OUTPUT_NODES):
-            dir = "%s/id%d" % (folder, i)
+        for i, armor_id in enumerate(["NO", "R1", "R2", "R3", "R4", "R5", "R6", "R7", "R8", "B1", "B2", "B3", "B4", "B5", "B6", "B7", "B8"]):
+            dir = "%s/%s" % (folder, armor_id)
             files = os.listdir(dir)
             for file in tqdm(files, postfix={"loading id": i}, dynamic_ncols=True):
                 if file[-3:] == "jpg":

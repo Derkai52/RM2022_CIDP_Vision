@@ -72,28 +72,28 @@ cv::Point2f points_center(cv::Point2f pts[4]){
     return center;
 }
 
-bool PredictorKalman::predict(const cv::Point2f armor_box_points[4], int &t, cv::Mat &im2show) {
+bool PredictorKalman::predict(const cv::Point2f armor_box_points[4], int id, double t, cv::Mat &im2show) {
     std::array<double, 4> q_;  // 初始化云台当前姿态角
-    double robot_speed_mps = 18.0; // TODO: 通过下位机知晓当前发射初速度（m/s）
-    q_[0] = -0.707;
-    q_[1] = 0.707;
-    q_[2] = 0.0;
-    q_[3] = 0.0;
+    double robot_speed_mps = 10.0; // TODO: 通过下位机知晓当前发射初速度（m/s）
+    // 在线可视化四元数转欧拉角 https://quaternions.online/
+    q_[0] =  0.500; // TODO: 若能通过陀螺仪知晓当前云台姿态角度，则注释这段
+    q_[1] =  -0.500; // 示例欧拉角XYZ（-90，90，0）
+    q_[2] =  0.500;
+    q_[3] =  -0.500;
 
     Eigen::Quaternionf q_raw(q_[0], q_[1], q_[2], q_[3]);
     Eigen::Quaternionf q(q_raw.matrix().transpose());
-//	std::cout<<qt[0]<<qt[1]<<qt[2]<<qt[3]<<std::endl;
+//	std::cout<<qt[0]<<qt[1]<<qt[2]<<qt[3]<<std::endl; // 显示陀螺仪姿态数据
     Eigen::Matrix3d R_IW = q.matrix().cast<double>();
-    Eigen::Vector3d m_pc = pnp_get_pc(armor_box_points, 3);             // point camera: 目标在相机坐标系下的坐标  // TODO: 装甲板类型需要从识别类别中获取。
+    Eigen::Vector3d m_pc = pnp_get_pc(armor_box_points, id);  // point camera: 目标在相机坐标系下的坐标  // TODO: 装甲板类型需要从识别类别中获取。
     Eigen::Vector3d m_pw = pc_to_pw(m_pc, R_IW);          // point world: 目标在世界坐标系下的坐标。（世界坐标系:陀螺仪的全局世界坐标系）
-
-    std::cout << "目标在世界坐标系下的坐标: " << m_pw << std::endl;
+//    std::cout << "目标在世界坐标系下的坐标: " << m_pw << std::endl;
 
     static double last_yaw = 0, last_speed = 0;
     double mc_yaw = std::atan2(m_pc(1,0), m_pc(0,0));
     double m_yaw = std::atan2(m_pw(1, 0), m_pw(0, 0));   // yaw的测量值，单位弧度
-//    std::cout << "m_yaw=" << m_yaw * 180. / M_PI << std::endl;
-    if(std::fabs(last_yaw - m_yaw) > 5. / 180. * M_PI){
+//    std::cout << "m_yaw=" << m_yaw * 180. / M_PI <<std::endl;
+    if(std::fabs(last_yaw - m_yaw) > 5. / 180. * M_PI){  // 两帧解算的Yaw超过5度则认为出现新目标，重置卡尔曼的状态值
         kalman.reset(m_yaw, t);
         last_yaw = m_yaw;
         std::cout << "reset" << std::endl;
@@ -106,34 +106,29 @@ bool PredictorKalman::predict(const cv::Point2f armor_box_points[4], int &t, cv:
     last_speed = state(1, 0);
     double c_yaw = state(0, 0);                                      // current yaw: yaw的滤波值，单位弧度
     double c_speed = state(1, 0) * m_pw.norm();                      // current speed: 角速度转线速度，单位m/s
-
 //    std::cout << "[m_yaw测量值=" << m_yaw * 180. / M_PI<< "] [c_yaw滤波值: " << c_yaw * 180. / M_PI << "] [c_speed线速度:" << c_speed << std::endl;
 //    std::cout << "t: " << t << " state(1, 0): " << state(1, 0) << std::endl;
 
-
-//    std::cout << "角速度: " << c_speed << std::endl;
+    // 线速度比例补偿
     double compensate_speed_signal = c_speed > 0 ? 1 : -1;
-    double compensate_speed = compensate_speed_signal * c_speed * 1.0;
-    c_speed += compensate_speed;                                   // speed compensate
+    double compensate_speed = compensate_speed_signal * c_speed * 1.1;
+    c_speed += compensate_speed;
 
-//    std::cout << "state: " << state << std::endl;
-    double predict_time = m_pw.norm() / robot_speed_mps + shoot_delay;           // 预测时间=发射延迟+飞行时间（单位:s）
-    double p_yaw = m_yaw + atan2(predict_time * c_speed, m_pw.norm());     // predict yaw: yaw的预测值，直线位移转为角度，单位弧度
-//    cout << "滤波值："<<c_yaw <<" | 预测值："<< p_yaw <<" | 预测时间："<<predict_time<<" | 目标距离："<< m_pw.norm()<<endl;
+    double predict_time = m_pw.norm() / robot_speed_mps + shoot_delay;        // 预测时间=发射延迟+飞行时间（单位:s）
+    double p_yaw = c_yaw + atan2(predict_time * c_speed, m_pw.norm());     // yaw的预测值，直线位移转为角度，单位弧度
+    //    cout << "滤波值："<<c_yaw <<" | 预测值："<< p_yaw <<" | 预测时间："<<predict_time<<" | 目标距离："<< m_pw.norm()<<endl;
 
     double length = sqrt(m_pw(0, 0) * m_pw(0, 0) + m_pw(1, 0) * m_pw(1, 0));
-    Eigen::Vector3d c_pw{length * cos(m_yaw), length * sin(m_yaw), m_pw(2, 0)};//反解位置(世界坐标系)
+    Eigen::Vector3d c_pw{length * cos(c_yaw), length * sin(c_yaw), m_pw(2, 0)};//反解位置(世界坐标系)
     Eigen::Vector3d p_pw{length * cos(p_yaw), length * sin(p_yaw), m_pw(2, 0)};
 
     double distance = p_pw.norm();                          // 目标距离（单位:m）
     double distance_xy = p_pw.topRows<2>().norm();
     double p_pitch = std::atan2(p_pw(2, 0), distance_xy);
-    //std::cout << fmt::format("distance: {}", distance) << std::endl;
+//    std::cout << "distance:"<<distance<<" qwer "<< distance_xy << std::endl;
 //    std::cout << state << std::endl;
 
-    // 计算抛物线
-    // 先解二次方程
-//    std::cout << "p_pitch: " << p_pitch <<std::endl;
+    // 计算抛物线，先解二次方程
     double a = 9.8 * 9.8 * 0.25;
     double b = -robot_speed_mps * robot_speed_mps - distance * 9.8 * cos(M_PI_2 + p_pitch);
     double c = distance * distance;
@@ -144,20 +139,14 @@ bool PredictorKalman::predict(const cv::Point2f armor_box_points[4], int &t, cv:
     double fly_time = sqrt(t_2);                                       // 子弹飞行时间（单位:s）
     // 解出抬枪高度，即子弹下坠高度
     double height = 0.5 * 9.8 * t_2;
-
-    //std::cout << m_pw << std::endl;
     float bs = robot_speed_mps;
     //std::cout << fmt::format("bullet_speed:{}, distance: {}, height: {}, p_pitch:{}",
     //                         bs, distance, height, p_pitch / M_PI * 180) << std::endl;
     Eigen::Vector3d s_pw{p_pw(0, 0), p_pw(1, 0), p_pw(2, 0) + height}; // 抬枪后预测点
 
-
-    /// re-project test
     /// 把世界坐标系中的点，重投影到图像中
-//    im2show = img.clone();
     re_project_point(im2show, c_pw, R_IW, {0, 255, 0}); // 绿色点（当前目标点）
     re_project_point(im2show, p_pw, R_IW, {255, 0, 0}); // 蓝色点（目标预测点）
-    // here is special change for no.4
     re_project_point(im2show, s_pw, R_IW, {0, 0, 255}); // 红色点（枪口补偿点）
     for (int i = 0; i < 4; ++i)
         cv::circle(im2show, armor_box_points[i], 3, {0, 255, 0}); // 绿色点（灯条四顶点）
@@ -167,16 +156,17 @@ bool PredictorKalman::predict(const cv::Point2f armor_box_points[4], int &t, cv:
     double s_yaw = atan(s_pc(0, 0) / s_pc(2, 0)) / M_PI * 180.;
     double s_pitch = atan(s_pc(1, 0) / s_pc(2, 0)) / M_PI * 180.;
     // 绘制角度波形图
-
     double yaw_angle = s_yaw;
     double pitch_angle = s_pitch;
     double yaw_speed = c_speed;
-//    std::cout << "s_pitch: " << s_pitch << std::endl;
-//
-//    if (std::abs(yaw_angle) < 90. && std::abs(pitch_angle) < 90.)
-//        shoot_mode = static_cast<uint8_t>(ShootMode::COMMON);
-//    else
-//        shoot_mode = static_cast<uint8_t>(ShootMode::CRUISE);
+
+//// TODO: 数据文件写入用于分析
+//    ofstream outFile;
+//    outFile.open(PROJECT_SOURCE_DIR"../a.txt", ios::app);//保存的文件名
+//    outFile<<to_string(m_yaw / M_PI * 180) + " " +to_string(c_yaw / M_PI * 180)+ " " + to_string(p_yaw / M_PI * 180) ;
+//    outFile<<"\n";
+//    outFile.close();//关闭文件写入流
+
 //	std::cout << "yaw角度: " << yaw_angle << " pitch角度: " << pitch_angle << " yaw速度: " << yaw_speed << "距离" << distance << std::endl;
     sendTarget(serial, yaw_angle, pitch_angle, distance);
     return true;
@@ -199,10 +189,16 @@ Eigen::Vector3d PredictorKalman::pnp_get_pc(const cv::Point2f p[4], int armor_nu
     std::vector<cv::Point2d> pu(p, p + 4);
     cv::Mat rvec, tvec;
 
-    if (armor_number == 0 || armor_number == 1)
+    if (armor_number >= 8){ // 由于分类序号原因，这里仅获得实际的数字编号 （详细分类参阅 armor_finder.cpp）
+        armor_number -= 7;}
+    if (armor_number == 1 || armor_number == 7 || armor_number == 8) {  // 当编号为【1、英雄  7、哨兵 8、基地】时，判定目标为大装甲板，其余情况均为小装甲板
         cv::solvePnP(pw_big, pu, F_MAT, C_MAT, rvec, tvec);
-    else
+//        cout << " 当前目标是大装甲" <<endl;
+    }
+    else {
         cv::solvePnP(pw_small, pu, F_MAT, C_MAT, rvec, tvec);
+//        cout << " 当前目标是小装甲" << endl;
+    }
 
     Eigen::Vector3d pc;
     cv::cv2eigen(tvec, pc);
@@ -234,7 +230,3 @@ bool PredictorKalman::sendTarget(Serial &serial, double x, double y, double z) {
 //        cout << (buff[7]<<8 | buff[8]) << endl;
     return serial.WriteData(buff, sizeof(buff));
 }
-
-//std::unique_ptr<PredictorBase> make_predictor_kalman() {
-//    return std::make_unique<PredictorKalman>();
-//}

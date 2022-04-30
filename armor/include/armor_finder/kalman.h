@@ -3,7 +3,7 @@
 #define CIDP_RM_CV_KALMAN_H
 
 #endif //CIDP_RM_CV_KALMAN_H
-
+#include "iostream"
 #ifndef _KALMAN_H_
 #define _KALMAN_H_
 
@@ -57,7 +57,7 @@ public:
     Matrix_x1d update(Matrix_z1d z_k, double t) {
         // 设置转移矩阵中的时间项
         for (int i = 1; i < V_X; i++) {
-            A(i - 1, i) = t - last_t;
+            A(i - 1, i) = t; // 这里的时间项应该给实际程序耗时
         }
         last_t = t;
 

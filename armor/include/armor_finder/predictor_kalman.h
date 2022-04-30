@@ -67,7 +67,7 @@ private:
                                  const Eigen::Matrix3d &R_IW, const cv::Scalar &color) {
         Eigen::Vector3d pc = pw_to_pc(pw, R_IW);
         Eigen::Vector3d pu = pc_to_pu(pc);
-        cv::circle(image, {int(pu(0, 0)), int(pu(1, 0))}, 3, color, 2);
+        cv::circle(image, {int(pu(0, 0)), int(pu(1, 0))}, 4, color, 3);
     }
 
     // pnp解算:获取相机坐标系内装甲板坐标
@@ -76,8 +76,7 @@ private:
 
 public:
     PredictorKalman();
-    bool predict(const cv::Point2f armor_box_points[4], int &, cv::Mat &);
-
+    bool predict(const cv::Point2f armor_box_points[4], int, double, cv::Mat &);
 
 };
 

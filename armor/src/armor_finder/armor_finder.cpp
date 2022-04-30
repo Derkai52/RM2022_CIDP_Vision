@@ -55,7 +55,7 @@ ArmorFinder::ArmorFinder(uint8_t &color, Serial &u, const string &paras_folder, 
 
 void ArmorFinder::run(cv::Mat &src) {
     getsystime(frame_time); //　获取当前帧时间(不是足够精确)
-//    stateSearchingTarget(src);                    // for debug
+//    stateSearchingTarget(src);  // for debug
 //    goto end;
     switch (state) {
         case SEARCHING_STATE: // 搜寻模式
@@ -67,8 +67,8 @@ void ArmorFinder::run(cv::Mat &src) {
                         cv::threshold(roi_gray, roi_gray, 180, 255, cv::THRESH_BINARY);  // 画面高亮区域筛选
                         contour_area = cv::countNonZero(roi_gray); // 【已弃用，判断图像是否全黑】
                     }
-                    tracker = TrackerToUse::create();            // 成功搜寻到装甲板，创建tracker对象(0~1000ms)
-                    tracker->init(src, target_box.rect);  // 跟踪器初始化,延迟速度视画面目标大小影响(2~40ms)
+                    tracker = TrackerToUse::create();            // 成功搜寻到装甲板，创建tracker对象
+                    tracker->init(src, target_box.rect);   // 跟踪器初始化,延迟速度视画面目标大小影响
 
                     state = TRACKING_STATE;
                     tracking_cnt = 0;
@@ -101,7 +101,7 @@ end:
     }
 
     if (show_armor_box) {                 // 根据条件显示当前目标装甲板
-        // TODO: 应该迁移到绘制函数里面去
+        // TODO: (绘制相机十字参考线)应该迁移到绘制函数里面去
         cv::line(src, cvPoint(320,0),cvPoint(320,480),(180,255,100),2);
         cv::line(src, cvPoint(0,240),cvPoint(640,240),(180,255,100),2);
         showArmorBox("box", src, target_box);
