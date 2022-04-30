@@ -53,7 +53,7 @@ def save_para(folder, paras, names, info):
             save_kernal(fp, para)
         fp.close()
 
-
+# 训练超参数
 STEPS = 100000
 BATCH = 40
 LEARNING_RATE_BASE = 0.0003
@@ -234,6 +234,6 @@ if __name__ == "__main__":
     #    import os
     #    os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
     #    os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
-    dataset = generate.DataSet("/home/nuc/Desktop/box_resize") # 待训练数据文件目录(请根据实际路径修改！)
+    dataset = generate.DataSet("/home/nuc/Desktop/armor_save_box") # 待训练数据文件目录(请根据实际路径修改！)
     train(dataset, show_bar=True)
     input("press enter to continue...")
