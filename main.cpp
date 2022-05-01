@@ -123,7 +123,7 @@ int main(int argc, char *argv[]) {
                     }
                     energy.setEnergyInit();
                 }
-                if (!from_camera) extract(ori_src);  // 画幅 resize
+                extract(ori_src);  // 画幅 resize
                 if (save_video) saveVideos(ori_src); // 保存视频
                 if (show_origin) showOrigin(ori_src);// 显示原始图像
                 energy.run(ori_src);
@@ -135,7 +135,7 @@ int main(int argc, char *argv[]) {
                     destroyAllWindows();
                 };
                 CNT_TIME("something whatever", {
-                        if (!from_camera) extract(ori_src);  // 画幅 resize
+                        extract(ori_src);  // 画幅 resize
                         if (save_video) saveVideos(ori_src); // 保存视频
                         if (show_origin) showOrigin(ori_src);// 显示原始图像
                 });
