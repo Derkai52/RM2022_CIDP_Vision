@@ -4,14 +4,9 @@
 
 #include "kalman.h"
 #include <Eigen/Dense>
-
 #include <opencv2/opencv.hpp>
 #include <opencv2/core/eigen.hpp>
 #include <serial.h>
-
-//#include "../autoaim.hpp"
-//#include <robot.hpp>
-//#include <umt/umt.hpp>
 #include <vector>
 
 constexpr int S = 2;
@@ -76,7 +71,7 @@ private:
 
 public:
     PredictorKalman();
-    bool predict(const cv::Point2f armor_box_points[4], int, double, cv::Mat &);
+    bool predict(const cv::Point2f armor_box_points[4], int, long long int, cv::Mat &);
 
 };
 

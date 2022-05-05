@@ -37,7 +37,8 @@ using namespace cv;
 using namespace std;
 using namespace camera;
 
-McuData mcu_data = {    // 单片机端回传结构体
+// 从下位机接收的数据
+McuData mcu_data = {
         0,              // 当前云台yaw角
         0,              // 当前云台pitch角
         ARMOR_STATE,    // 当前状态，自瞄-大符-小符
@@ -70,7 +71,6 @@ int main(int argc, char *argv[]) {
         mcu_data.enemy_color = ENEMY_RED;
     else
         mcu_data.enemy_color = ENEMY_BLUE;
-//    mcu_data.enemy_color = ENEMY_BLUE;
 
     // 根据条件输入选择视频源 (1、海康相机  0、视频文件)
     int from_camera = 0; // 默认视频源
@@ -78,7 +78,6 @@ int main(int argc, char *argv[]) {
 //        cout << "输入 1 使用海康相机, 输入 0 运行视频" << endl;
 //        cin >> from_camera;
 //    }
-
 
     // 打开视频源
     if (from_camera) {
@@ -110,7 +109,6 @@ int main(int argc, char *argv[]) {
             if (curr_state != ARMOR_STATE) {  // 能量机关模式
                 if (last_state == ARMOR_STATE) {//若上一帧不是大能量机关模式，即刚往完成切换，则需要初始化
                     destroyAllWindows();
-
 
                     if (curr_state == BIG_ENERGY_STATE) {            // 大能量机关模式
                         energy.is_small = false;

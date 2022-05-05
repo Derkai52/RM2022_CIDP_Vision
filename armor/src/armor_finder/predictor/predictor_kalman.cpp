@@ -7,7 +7,7 @@
 
 
 #define PROJECT_SOURCE_DIR
-
+extern McuData mcu_data;     // 下位机数据
 constexpr double shoot_delay = 0.09;   // 射击延迟: 90ms
 
 PredictorKalman::PredictorKalman() {
@@ -41,7 +41,7 @@ PredictorKalman::PredictorKalman() {
 }
 
 // 计算任意四边形的中心
-cv::Point2f points_center(cv::Point2f pts[4]){
+cv::Point2f points_center(cv::Point2f pts[4]) {
     for (int i = 0; i < 4; ++i) {
         for (int j = i+1; j < 4; ++j) {
             if (pts[i] == pts[j]) {
@@ -72,20 +72,56 @@ cv::Point2f points_center(cv::Point2f pts[4]){
     return center;
 }
 
-bool PredictorKalman::predict(const cv::Point2f armor_box_points[4], int id, double t, cv::Mat &im2show) {
+// 欧拉角转旋转矩阵     代码参考：https://blog.csdn.net/coldplayplay/article/details/79271139
+Eigen::Matrix3d euler2RotationMatrix(double roll, double pitch, double yaw) {
+    Eigen::AngleAxisd rollAngle(roll, Eigen::Vector3d::UnitZ());
+    Eigen::AngleAxisd yawAngle(yaw, Eigen::Vector3d::UnitY());
+    Eigen::AngleAxisd pitchAngle(pitch, Eigen::Vector3d::UnitX());
+
+    Eigen::Quaterniond q = rollAngle*yawAngle*pitchAngle;
+    Eigen::Matrix3d R = q.matrix().cast<double>();
+//    cout << "Euler2RotationMatrix result is:" <<endl;
+//    cout << "R = " << R <<endl;
+    return R;
+}
+
+// 欧拉角转四元数
+Eigen::Quaterniond euler2Quaternion(double roll, double pitch, double yaw) {
+    Eigen::AngleAxisd rollAngle(roll, Eigen::Vector3d::UnitZ());
+    Eigen::AngleAxisd yawAngle(yaw, Eigen::Vector3d::UnitY());
+    Eigen::AngleAxisd pitchAngle(pitch, Eigen::Vector3d::UnitX());
+
+    Eigen::Quaterniond q = rollAngle* yawAngle* pitchAngle;
+    cout << "Euler2Quaternion result is:" <<endl;
+    cout << "x = " << q.x() <<endl;
+    cout << "y = " << q.y() <<endl;
+    cout << "z = " << q.z() <<endl;
+    cout << "w = " << q.w() <<endl<<endl;
+    return q;
+}
+
+
+bool PredictorKalman::predict(const cv::Point2f armor_box_points[4], int id, long long int t, cv::Mat &im2show) {
     std::array<double, 4> q_;  // 初始化云台当前姿态角
-    double robot_speed_mps = 10.0; // TODO: 通过下位机知晓当前发射初速度（m/s）
+    double robot_speed_mps = 18.0; // TODO: 应当通过下位机知晓当前发射初速度（m/s）
+
+    // TODO: 若能通过陀螺仪知晓当前云台姿态角度，则注释这段
+    //////////////////////////////////////////////////////////////////////////
     // 在线可视化四元数转欧拉角 https://quaternions.online/
-    q_[0] =  0.500; // TODO: 若能通过陀螺仪知晓当前云台姿态角度，则注释这段
+    q_[0] =  0.500;
     q_[1] =  -0.500; // 示例欧拉角XYZ（-90，90，0）
     q_[2] =  0.500;
     q_[3] =  -0.500;
 
     Eigen::Quaternionf q_raw(q_[0], q_[1], q_[2], q_[3]);
     Eigen::Quaternionf q(q_raw.matrix().transpose());
-//	std::cout<<qt[0]<<qt[1]<<qt[2]<<qt[3]<<std::endl; // 显示陀螺仪姿态数据
+//	std::cout<<q_[0]<<q_[1]<<q_[2]<<q_[3]<<std::endl; // 显示陀螺仪姿态数据
     Eigen::Matrix3d R_IW = q.matrix().cast<double>();
-    Eigen::Vector3d m_pc = pnp_get_pc(armor_box_points, id);  // point camera: 目标在相机坐标系下的坐标  // TODO: 装甲板类型需要从识别类别中获取。
+///////////////////////////////////////////////////////////////////////////////
+
+    // TODO: 这里会出现时间戳不对齐
+//    Eigen::Matrix3d R_IW = euler2RotationMatrix(0.0, mcu_data.curr_pitch, mcu_data.curr_yaw); //通过下位机数据获取当前云台旋转矩阵
+    Eigen::Vector3d m_pc = pnp_get_pc(armor_box_points, id);  // point camera: 目标在相机坐标系下的坐标
     Eigen::Vector3d m_pw = pc_to_pw(m_pc, R_IW);          // point world: 目标在世界坐标系下的坐标。（世界坐标系:陀螺仪的全局世界坐标系）
 //    std::cout << "目标在世界坐标系下的坐标: " << m_pw << std::endl;
 
@@ -109,14 +145,13 @@ bool PredictorKalman::predict(const cv::Point2f armor_box_points[4], int id, dou
 //    std::cout << "[m_yaw测量值=" << m_yaw * 180. / M_PI<< "] [c_yaw滤波值: " << c_yaw * 180. / M_PI << "] [c_speed线速度:" << c_speed << std::endl;
 //    std::cout << "t: " << t << " state(1, 0): " << state(1, 0) << std::endl;
 
-    // 线速度比例补偿
-    double compensate_speed_signal = c_speed > 0 ? 1 : -1;
-    double compensate_speed = compensate_speed_signal * c_speed * 1.1;
+//   线速度比例补偿
+    double compensate_speed = c_speed * 1.1;
     c_speed += compensate_speed;
 
     double predict_time = m_pw.norm() / robot_speed_mps + shoot_delay;        // 预测时间=发射延迟+飞行时间（单位:s）
     double p_yaw = c_yaw + atan2(predict_time * c_speed, m_pw.norm());     // yaw的预测值，直线位移转为角度，单位弧度
-    //    cout << "滤波值："<<c_yaw <<" | 预测值："<< p_yaw <<" | 预测时间："<<predict_time<<" | 目标距离："<< m_pw.norm()<<endl;
+//  cout << "滤波值："<<c_yaw <<" | 预测值："<< p_yaw <<" | 预测时间："<<predict_time<<" | 目标距离："<< m_pw.norm()<<endl;
 
     double length = sqrt(m_pw(0, 0) * m_pw(0, 0) + m_pw(1, 0) * m_pw(1, 0));
     Eigen::Vector3d c_pw{length * cos(c_yaw), length * sin(c_yaw), m_pw(2, 0)};//反解位置(世界坐标系)
@@ -125,7 +160,6 @@ bool PredictorKalman::predict(const cv::Point2f armor_box_points[4], int id, dou
     double distance = p_pw.norm();                          // 目标距离（单位:m）
     double distance_xy = p_pw.topRows<2>().norm();
     double p_pitch = std::atan2(p_pw(2, 0), distance_xy);
-//    std::cout << "distance:"<<distance<<" qwer "<< distance_xy << std::endl;
 //    std::cout << state << std::endl;
 
     // 计算抛物线，先解二次方程
@@ -134,8 +168,6 @@ bool PredictorKalman::predict(const cv::Point2f armor_box_points[4], int id, dou
     double c = distance * distance;
     // 带入求根公式，解出t^2
     double t_2 = (- sqrt(b * b - 4 * a * c) - b) / (2 * a);
-//    std::cout << fmt::format("a:{}, b:{}, c:{}", a, b, c) << std::endl;
-//    std::cout << "t2:" << t_2 << std::endl;
     double fly_time = sqrt(t_2);                                       // 子弹飞行时间（单位:s）
     // 解出抬枪高度，即子弹下坠高度
     double height = 0.5 * 9.8 * t_2;
@@ -167,7 +199,7 @@ bool PredictorKalman::predict(const cv::Point2f armor_box_points[4], int id, dou
 //    outFile<<"\n";
 //    outFile.close();//关闭文件写入流
 
-//	std::cout << "yaw角度: " << yaw_angle << " pitch角度: " << pitch_angle << " yaw速度: " << yaw_speed << "距离" << distance << std::endl;
+	std::cout << "yaw角度: " << yaw_angle << " pitch角度: " << pitch_angle << " yaw速度: " << yaw_speed << " 距离 " << distance << std::endl;
     sendTarget(serial, yaw_angle, pitch_angle, distance);
     return true;
 

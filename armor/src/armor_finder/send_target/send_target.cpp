@@ -5,6 +5,7 @@
 #include <math.h>
 #include "armor_finder/predictor_kalman.h"
 #include "armor_finder/kalman.h"
+#include <chrono>
 
 extern PredictorKalman predictor;
 extern cv::Mat ori_src;
@@ -43,7 +44,7 @@ vector<double> ArmorFinder::none_predict_run(){
     return vector<double>{yaw, pitch, dist};
 }
 
-bool ArmorFinder::predict_run(double ave_cal_time) {
+bool ArmorFinder::predict_run(long long int ave_cal_time) {
 //    if (target_box.light_blobs.size()==2)
     cv::Point lt = cv::Point(target_box.light_blobs[0].rect.center.x, target_box.light_blobs[0].rect.center.y - target_box.light_blobs[0].length*0.5);
     cv::Point lb = cv::Point(target_box.light_blobs[0].rect.center.x, target_box.light_blobs[0].rect.center.y + target_box.light_blobs[0].length*0.5);
@@ -72,7 +73,6 @@ bool ArmorFinder::predict_run(double ave_cal_time) {
 
 
 int ave_cal_time = 10; // 打印发送帧率 （采样间隔1000ms）
-double consume_time = 10;  // 程序耗时
 bool ArmorFinder::sendBoxPosition(uint16_t shoot_delay) {
     bool ok = false;
     if (target_box.rect == cv::Rect2d()) return false;
@@ -89,16 +89,23 @@ bool ArmorFinder::sendBoxPosition(uint16_t shoot_delay) {
             last_time = t;
             cout << "识别到装甲板: 发送帧率:" << fps << endl;
             ave_cal_time = (int)1000/fps;
-            consume_time = (double)t;
-            fps = 0;
+
+        fps = 0;
         }
         fps += 1;
     #endif
+    auto timeNow = chrono::duration_cast<chrono::milliseconds>(chrono::system_clock::now().time_since_epoch());
+    long long int bufTime = timeNow.count();
+    struct timeval tv;
+    gettimeofday(&tv,NULL);
+//        cout << tv.tv_sec * 1000 + tv.tv_usec / 1000   << endl;
+
 
     auto rect = target_box.rect;
     double yaw;   // 发送给电控yaw角度
     double pitch; // 发送给电控pitch角度
     double dist;  // 发送给电控dist目标距离
+    armor_predictor = true;
     if(!armor_predictor){ // 不使用预测模式（可用于测试电控）
         auto result = ArmorFinder::none_predict_run();
         yaw = result[0];
@@ -108,6 +115,6 @@ bool ArmorFinder::sendBoxPosition(uint16_t shoot_delay) {
         return sendTarget(serial, yaw, -pitch, dist, shoot_delay);
     }
     else{
-        ArmorFinder::predict_run(0.3);
+        ArmorFinder::predict_run(tv.tv_sec * 1000 + tv.tv_usec / 1000);
     }
 }
