@@ -105,7 +105,7 @@ end:
         cv::line(src, cvPoint(320,0),cvPoint(320,480),(180,255,100),2);
         cv::line(src, cvPoint(0,240),cvPoint(640,240),(180,255,100),2);
         showArmorBox("box", src, target_box);
-        cv::waitKey(1);
+//        cv::waitKey(1);
     }
 }
 

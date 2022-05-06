@@ -124,8 +124,6 @@ bool ArmorFinder::findArmorBox(const cv::Mat &src, ArmorBox &box) {
         }
     });
 
-
-
     if (show_light_blobs && state==SEARCHING_STATE) {
         showLightBlobs("light_blobs", src, light_blobs);
         cv::waitKey(1);
@@ -187,6 +185,41 @@ bool ArmorFinder::findArmorBox(const cv::Mat &src, ArmorBox &box) {
         box = armor_boxes[0];
     }
     return true;
+}
+
+// 获取装甲板四点（用于PNP解算）
+void ArmorBox::getFourPoint(ArmorBox &box) {
+    cv::Point2f vertices[4], pt[4], st[4];
+    int _temp = 0; // 计数器
+    for(auto &light_blob :box.light_blobs){
+        light_blob.rect.points(vertices);  // rRect.points有顺序的，y最小的点是0,顺时针1 2 3
+        float anglei = fabs(light_blob.rect.angle);
+        // 往右斜的长灯条
+        if(anglei >= 45.0){
+            pt[0] = vertices[3];
+            pt[1] = vertices[0];
+            pt[2] = vertices[2];
+            pt[3] = vertices[1];
+        }
+        // 往左斜的长灯条
+        else{
+            pt[0] = vertices[2];
+            pt[1] = vertices[3];
+            pt[2] = vertices[1];
+            pt[3] = vertices[0];
+        }
+        cv::Point2f _blob_top = cv::Point2i((pt[0].x + pt[2].x)/2 , (pt[0].y + pt[2].y)/2);    // 灯条顶部中心
+        cv::Point2f _blob_bottom = cv::Point2i((pt[1].x + pt[3].x)/2 , (pt[1].y + pt[3].y)/2); // 灯条底部中心
+        st[_temp] = _blob_top;
+        st[_temp+1] = _blob_bottom;
+        _temp += 2;
+    }
+    if(st[0].x >= st[3].x) { // Warning: 因为横着的装甲板不被识别，所以这里用了比较偷懒的做法，直接比较灯条顶点的x值大小来决定灯条的左右顺序
+        four_point = {st[0], st[1], st[3], st[2]};
+    }
+    else{
+        four_point = {st[2], st[3], st[1], st[0]};
+    }
 }
 
 

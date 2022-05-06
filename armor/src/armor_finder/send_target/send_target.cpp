@@ -45,19 +45,11 @@ vector<double> ArmorFinder::none_predict_run(){
 }
 
 bool ArmorFinder::predict_run(long long int ave_cal_time) {
-//    if (target_box.light_blobs.size()==2)
-    cv::Point lt = cv::Point(target_box.light_blobs[0].rect.center.x, target_box.light_blobs[0].rect.center.y - target_box.light_blobs[0].length*0.5);
-    cv::Point lb = cv::Point(target_box.light_blobs[0].rect.center.x, target_box.light_blobs[0].rect.center.y + target_box.light_blobs[0].length*0.5);
-    cv::Point rb = cv::Point(target_box.light_blobs[1].rect.center.x, target_box.light_blobs[1].rect.center.y + target_box.light_blobs[1].length*0.5);
-    cv::Point rt = cv::Point(target_box.light_blobs[1].rect.center.x, target_box.light_blobs[1].rect.center.y - target_box.light_blobs[1].length*0.5);
-//        std::vector<cv::Point2f> strVec{light_lt, light_rt, light_rb, light_lb};
-
-//    auto rect = target_box.rect;                                   // 获取当前目标装甲板
-//    cv::Point2f lt(rect.x, rect.y);                                // 左上
-//    cv::Point2f lb(rect.x, rect.y+rect.height);                // 左下
-//    cv::Point2f rb(rect.x+rect.width, rect.y+rect.height); // 右下
-//    cv::Point2f rt(rect.x+rect.width, rect.y);                 // 右上
-//    cv::Point2f armor_center(rect.x+rect.width*0.5, rect.y+rect.height*0.5);  // 装甲板中心点
+    target_box.getFourPoint(target_box); // 获取目标装甲板灯条四点
+    cv::Point lt = cv::Point(target_box.four_point[0]);
+    cv::Point lb = cv::Point(target_box.four_point[1]);
+    cv::Point rb = cv::Point(target_box.four_point[2]);
+    cv::Point rt = cv::Point(target_box.four_point[3]);
 
     // 装甲板的四点排序： 左上 -> 左下 -> 右下 -> 右上
     const cv::Point2f armor_box_points[4]{lt, lb, rb, rt};

@@ -73,15 +73,18 @@ public:
     LightBlobs light_blobs;
     uint8_t box_color;
     int id;
+    vector<cv::Point2f> four_point;         // 装甲板的灯条四顶点（左上->左下->右下->右上）  （从左上开始逆时针）
+
 
     explicit ArmorBox(const cv::Rect &pos=cv::Rect2d(), const LightBlobs &blobs=LightBlobs(), uint8_t color=0, int i=0);
 
-    cv::Point2f getCenter() const; // 获取装甲板中心
-    double getBlobsDistance() const; // 获取两个灯条中心间距
-    double lengthDistanceRatio() const; // 获取灯条中心距和灯条长度的比值
-    double getBoxDistance() const; // 获取装甲板到摄像头的距离
-    BoxOrientation getOrientation() const; // 获取装甲板朝向(误差较大，已弃用)
+    cv::Point2f getCenter() const;          // 获取装甲板中心
+    double getBlobsDistance() const;        // 获取两个灯条中心间距
+    double lengthDistanceRatio() const;     // 获取灯条中心距和灯条长度的比值
+    double getBoxDistance() const;          // 获取装甲板到摄像头的距离
+    BoxOrientation getOrientation() const;  // 获取装甲板朝向(误差较大，已弃用)
     bool operator<(const ArmorBox &box) const; // 装甲板优先级比较
+    void getFourPoint(ArmorBox &box);       // 获取装甲板四点（用于PNP解算）
 };
 
 typedef std::vector<ArmorBox> ArmorBoxes;
@@ -104,7 +107,6 @@ private:
     const uint8_t &is_anti_top;                         // 进入反陀螺，引用外部变量，自动变化
     State state;                                        // 自瞄状态对象实例
     ArmorBox target_box, last_box;                      // 目标装甲板
-    vector<cv::Point2f> four_point;                     // 灯条四点（左上->右上->右下->左下）
     int anti_switch_cnt;                                // 防止乱切目标计数器
     cv::Ptr<cv::Tracker> tracker;                       // tracker对象实例
     Classifier classifier;                              // CNN分类器对象实例，用于数字识别
@@ -124,12 +126,10 @@ private:
     bool stateSearchingTarget(cv::Mat &src);            // searching state主函数
     bool stateTrackingTarget(cv::Mat &src);             // tracking state主函数
     bool stateStandBy();                                // stand by state主函数（已弃用）
-
     void antiTop();                                     // 反小陀螺
-
     bool sendBoxPosition(uint16_t shoot);               // 和主控板通讯
     vector<double> none_predict_run();                  // 普通模式（不加预测，用于测试电控）
-    bool predict_run(long long int ave_cal_time);              // 预测模式
+    bool predict_run(long long int ave_cal_time);       // 预测模式
 
 public:
     void run(cv::Mat &src);                             // 自瞄主函数

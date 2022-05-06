@@ -199,7 +199,7 @@ bool PredictorKalman::predict(const cv::Point2f armor_box_points[4], int id, lon
 //    outFile<<"\n";
 //    outFile.close();//关闭文件写入流
 
-	std::cout << "yaw角度: " << yaw_angle << " pitch角度: " << pitch_angle << " yaw速度: " << yaw_speed << " 距离 " << distance << std::endl;
+//	std::cout << "yaw角度: " << yaw_angle << " pitch角度: " << pitch_angle << " yaw速度: " << yaw_speed << " 距离 " << distance << std::endl;
     sendTarget(serial, yaw_angle, pitch_angle, distance);
     return true;
 
