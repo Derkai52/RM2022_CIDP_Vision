@@ -56,12 +56,10 @@ public:
 
     Matrix_x1d update(Matrix_z1d z_k, double t) {
         // 设置转移矩阵中的时间项
-//        std::cout <<"接收到的数据："<< t << "差值：" << (double)((t-last_t)/100)<<  std::endl;
         for (int i = 1; i < V_X; i++) {
             A(i - 1, i) = (double)((t-last_t)/100); // 这里的时间项应该给实际程序耗时 s
         }
         last_t = t;
-//        std::cout <<A<<  std::endl;
 
         // 预测下一时刻的值
         Matrix_x1d p_x_k = A * x_k1;   //x的先验估计由上一个时间点的后验估计值和输入信息给出，此处需要根据基站高度做一个修改

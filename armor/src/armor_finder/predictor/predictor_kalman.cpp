@@ -129,6 +129,8 @@ bool PredictorKalman::predict(const cv::Point2f armor_box_points[4], int id, lon
     double mc_yaw = std::atan2(m_pc(1,0), m_pc(0,0));
     double m_yaw = std::atan2(m_pw(1, 0), m_pw(0, 0));   // yaw的测量值，单位弧度
 //    std::cout << "m_yaw=" << m_yaw * 180. / M_PI <<std::endl;
+
+    // TODO: 需要增加对（陀螺方向与移动方向相同）移动陀螺的鉴别，否则会超调
     if(std::fabs(last_yaw - m_yaw) > 5. / 180. * M_PI){  // 两帧解算的Yaw超过5度则认为出现新目标，重置卡尔曼的状态值
         kalman.reset(m_yaw, t);
         last_yaw = m_yaw;
@@ -194,7 +196,7 @@ bool PredictorKalman::predict(const cv::Point2f armor_box_points[4], int id, lon
 
 //// TODO: 数据文件写入用于分析
 //    ofstream outFile;
-//    outFile.open(PROJECT_SOURCE_DIR"../a.txt", ios::app);//保存的文件名
+//    outFile.open(PROJECT_SOURCE_DIR"../kf_data_sample.txt", ios::app);//保存的文件名
 //    outFile<<to_string(m_yaw / M_PI * 180) + " " +to_string(c_yaw / M_PI * 180)+ " " + to_string(p_yaw / M_PI * 180) ;
 //    outFile<<"\n";
 //    outFile.close();//关闭文件写入流
