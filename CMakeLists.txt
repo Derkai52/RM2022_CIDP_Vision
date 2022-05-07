@@ -17,6 +17,7 @@ if (CONFIG_FOUND)
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DWITH_CONFIG")
 endif()
 
+add_compile_definitions(PROJECT_DIR="${PROJECT_SOURCE_DIR}")
 
 FIND_PROGRAM(CCACHE_FOUND ccache) # ccache编译器缓存
 IF(CCACHE_FOUND)

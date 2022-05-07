@@ -12,7 +12,7 @@ constexpr double shoot_delay = 0.09;   // 射击延迟: 90ms
 
 PredictorKalman::PredictorKalman() {
     // 1、初始化相机内参、坐标系转换关系
-    cv::FileStorage fin(PROJECT_SOURCE_DIR"../camera-param.yml", cv::FileStorage::READ);
+    cv::FileStorage fin(PROJECT_DIR"/camera-param.yml", cv::FileStorage::READ);
     if(!fin.isOpened()){
         LOGE("camera-param.yml don`t find or open fail!");
         throw 1;
