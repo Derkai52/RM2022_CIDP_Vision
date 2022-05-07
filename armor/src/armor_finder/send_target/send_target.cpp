@@ -44,7 +44,11 @@ vector<double> ArmorFinder::none_predict_run(){
     return vector<double>{yaw, pitch, dist};
 }
 
-bool ArmorFinder::predict_run(long long int ave_cal_time) {
+bool ArmorFinder::predict_run() {
+    struct timeval tv;
+    gettimeofday(&tv,NULL);
+    long long int sys_time_stamp = tv.tv_sec * 1000 + tv.tv_usec / 1000; // 获取当前系统时间戳
+
     target_box.getFourPoint(target_box); // 获取目标装甲板灯条四点
     cv::Point lt = cv::Point(target_box.four_point[0]);
     cv::Point lb = cv::Point(target_box.four_point[1]);
@@ -55,7 +59,7 @@ bool ArmorFinder::predict_run(long long int ave_cal_time) {
     const cv::Point2f armor_box_points[4]{lt, lb, rb, rt};
 
     cv::Mat im2show = ori_src;
-    bool ok = predictor.predict(armor_box_points, target_box.id, ave_cal_time, im2show);
+    bool ok = predictor.predict(armor_box_points, target_box.id, sys_time_stamp, im2show);
     if(!ok) {
         cout << "预测失败,按未预测输出" << endl;
         return false;
@@ -86,12 +90,6 @@ bool ArmorFinder::sendBoxPosition(uint16_t shoot_delay) {
         }
         fps += 1;
     #endif
-    auto timeNow = chrono::duration_cast<chrono::milliseconds>(chrono::system_clock::now().time_since_epoch());
-    long long int bufTime = timeNow.count();
-    struct timeval tv;
-    gettimeofday(&tv,NULL);
-//        cout << tv.tv_sec * 1000 + tv.tv_usec / 1000   << endl;
-
 
     auto rect = target_box.rect;
     double yaw;   // 发送给电控yaw角度
@@ -107,6 +105,6 @@ bool ArmorFinder::sendBoxPosition(uint16_t shoot_delay) {
         return sendTarget(serial, yaw, -pitch, dist, shoot_delay);
     }
     else{
-        ArmorFinder::predict_run(tv.tv_sec * 1000 + tv.tv_usec / 1000);
+        ArmorFinder::predict_run();
     }
 }
