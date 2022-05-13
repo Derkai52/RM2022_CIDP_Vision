@@ -58,7 +58,7 @@ bool ArmorFinder::stateTrackingTarget(cv::Mat &src) {
             }
         }
         target_box.rect = pos;
-        target_box.light_blobs.clear();
+//        target_box.light_blobs.clear(); // TODO: 跟踪器跟踪应该模拟出灯条信息
     }
     return true;
 }

@@ -72,6 +72,7 @@ private:
 public:
     PredictorKalman();
     bool predict(const cv::Point2f armor_box_points[4], int, long long int, cv::Mat &);
+    bool none_predict(const cv::Point2f armor_box_points[4], int, long long int, cv::Mat &);
 
 };
 

@@ -25,6 +25,8 @@ class DataSet:
 
     def file2nparray(self, name):
         image = cv2.imread(name)
+        if image is None:
+            print("Open Image file fail!")
         image = cv2.resize(image, (SRC_COLS, SRC_ROWS))
         image = image.astype(np.float32)
         return image / 255.0
@@ -36,7 +38,7 @@ class DataSet:
 
     def generate_data_sets(self, folder):
         sets = []
-        for i, armor_id in enumerate(["NO", "R1", "R2", "R3", "R4", "R5", "R6", "R7", "R8", "B1", "B2", "B3", "B4", "B5", "B6", "B7", "B8"]):
+        for i, armor_id in enumerate(["NO", "R1", "R2", "R3", "R4", "R5", "R7", "R8", "B1", "B2", "B3", "B4", "B5", "B7", "B8"]):
             dir = "%s/%s" % (folder, armor_id)
             files = os.listdir(dir)
             for file in tqdm(files, postfix={"loading id": i}, dynamic_ncols=True):

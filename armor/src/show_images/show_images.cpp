@@ -95,22 +95,28 @@ void showArmorBox(std::string windows_name, const cv::Mat &src, const ArmorBox &
 //        fprintf(fp, "%lf %lf %lf\n", box.light_blobs[0].length, box.light_blobs[1].length, box.getBlobsDistance())
 //    cout << box.lengthDistanceRatio() << endl;
 
-    if(box.getOrientation() == ArmorBox::FRONT){
-        rectangle(image2show, box.rect, Scalar(200, 200, 200), 2);
+    if(armor_predictor){ // 显示当前视觉模式【预测、 非预测】
+        putText(image2show, "Predict ON", Point(20,30), cv::FONT_HERSHEY_DUPLEX, 1, Scalar(0, 255, 0));
     }else{
-        rectangle(image2show, box.rect, Scalar(200, 200, 200), 2);
+        putText(image2show, "Predict OFF", Point(20,30), cv::FONT_HERSHEY_DUPLEX, 1, Scalar(0, 0, 255));
+    }
+
+    if(box.getOrientation() == ArmorBox::FRONT){ // 用于描述装甲板姿态【正对、侧对】
+        rectangle(image2show, box.rect, Scalar(200, 200, 200), 3);
+    }else{
+        rectangle(image2show, box.rect, Scalar(200, 200, 200), 1);
     }
 
     char dist[10];
     sprintf(dist, "%.1f", box.getBoxDistance());
     if (box.id == -1)
-        putText(image2show, id2name[box.id]+" "+dist, Point(box.rect.x + 2, box.rect.y - 2), cv::FONT_HERSHEY_DUPLEX, 1,
+        putText(image2show, id2name[box.id]+" "+dist, Point(box.rect.x + 2, box.rect.y - 4), cv::FONT_HERSHEY_DUPLEX, 1,
                 Scalar(0, 255, 0));
     else if (1 <= box.id && box.id < 8)
-        putText(image2show, id2name[box.id]+" "+dist, Point(box.rect.x + 2, box.rect.y - 2), cv::FONT_HERSHEY_DUPLEX, 1,
+        putText(image2show, id2name[box.id]+" "+dist, Point(box.rect.x + 2, box.rect.y - 4), cv::FONT_HERSHEY_DUPLEX, 1,
                 Scalar(255, 0, 0));
     else if (8 <= box.id && box.id < 15)
-        putText(image2show, id2name[box.id]+" "+dist, Point(box.rect.x + 2, box.rect.y-2), cv::FONT_HERSHEY_DUPLEX, 1,
+        putText(image2show, id2name[box.id]+" "+dist, Point(box.rect.x + 2, box.rect.y - 4), cv::FONT_HERSHEY_DUPLEX, 1,
                 Scalar(0, 0, 255));
     else if (box.id != 0)
         LOGE_INFO("Invalid box id:%d!", box.id);

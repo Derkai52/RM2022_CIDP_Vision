@@ -57,7 +57,7 @@ PredictorKalman predictor;       // 初始化卡尔曼
 cv::Mat ori_src;
 
 // 自瞄主程序对象
-ArmorFinder armor_finder(mcu_data.enemy_color, serial, PROJECT_DIR"/tools/para/", mcu_data.anti_top);
+ArmorFinder armor_finder(mcu_data.enemy_color, serial, PROJECT_DIR"/tools/para/", false);
 // 能量机关主程序对象
 Energy energy(serial, mcu_data.enemy_color);
 
@@ -71,7 +71,9 @@ int main(int argc, char *argv[]) {
         mcu_data.enemy_color = ENEMY_RED;
     else
         mcu_data.enemy_color = ENEMY_BLUE;
-    mcu_data.enemy_color = ENEMY_BLUE;
+//    mcu_data.enemy_color = ENEMY_BLUE;
+
+//    mcu_data.enemy_color = ENEMY_BLUE;
 
     // 根据条件输入选择视频源 (1、海康相机  0、视频文件)
     int from_camera = 0; // 默认视频源
@@ -84,7 +86,7 @@ int main(int argc, char *argv[]) {
     if (from_camera) {
         MVS_cap.Init(); // 初始化海康相机
     } else {
-        video = new VideoWrapper(PROJECT_DIR"/videoTest/move_top.avi"); // 视频文件路径
+        video = new VideoWrapper(PROJECT_DIR"/videoTest/armor_red.mp4"); // 视频文件路径
         if (video->init()) {
             LOGM("video_source initialization successfully.");
         } else {

@@ -24,6 +24,7 @@ extern uint8_t last_state;
 extern ArmorFinder armor_finder;
 extern Energy energy;
 
+
 void uartReceive(Serial *pSerial) {
     char buffer[40];
     LOGM(STR_CTR(WORD_LIGHT_WHITE, "data receive start!"));

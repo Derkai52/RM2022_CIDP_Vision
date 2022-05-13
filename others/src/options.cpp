@@ -17,7 +17,7 @@ bool show_energy = false;      // 显示能量机关
 bool save_mark = false;        // 保存能量机关标志点
 bool show_info = false;        // 仅终端显示目标信息
 bool run_by_frame = false;     // 图像源仅使用视频流
-bool recv_close = false; // 无法获取裁判系统颜色时，手动设置目标装甲板颜色 【true:红色 false：蓝色】
+bool recv_close = false; // 无法获取裁判系统颜色时，手动设置目标装甲板颜色 【true:目标蓝色 false：目标红色】
 bool armor_predictor = false;  // 目标预测器
 
 
@@ -34,7 +34,6 @@ std::map<std::string, std::pair<std::string, void(*)(void)>> options = {
     {"--show-armor-box", {
         "show the aim box.", []() {
             show_armor_box = true;
-            armor_predictor = true;
             LOGM("Enable show armor box");
         }
     }},

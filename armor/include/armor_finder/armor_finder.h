@@ -81,7 +81,7 @@ public:
     cv::Point2f getCenter() const;          // 获取装甲板中心
     double getBlobsDistance() const;        // 获取两个灯条中心间距
     double lengthDistanceRatio() const;     // 获取灯条中心距和灯条长度的比值
-    double getBoxDistance() const;          // 获取装甲板到摄像头的距离
+    double getBoxDistance() const;          // 获取装甲板到摄像头的距离(三角测距法)【对于侧对目标不准】
     BoxOrientation getOrientation() const;  // 获取装甲板朝向(误差较大，已弃用)
     bool operator<(const ArmorBox &box) const; // 装甲板优先级比较
     void getFourPoint(ArmorBox &box);       // 获取装甲板四点（用于PNP解算）
@@ -128,8 +128,8 @@ private:
     bool stateStandBy();                                // stand by state主函数（已弃用）
     void antiTop();                                     // 反小陀螺
     bool sendBoxPosition(uint16_t shoot);               // 和主控板通讯
-    vector<double> none_predict_run();                  // 普通模式（不加预测，用于测试电控）
-    bool predict_run();                                 // 预测模式
+    bool old_run();                  // 普通模式（不加预测，用于测试电控）【由于三角测距法并不准确，已弃用】
+    bool target_solving();                              // 目标解算
 
 public:
     void run(cv::Mat &src);                             // 自瞄主函数
