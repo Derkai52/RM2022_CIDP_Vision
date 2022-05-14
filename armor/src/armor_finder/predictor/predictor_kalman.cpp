@@ -228,9 +228,8 @@ bool PredictorKalman::predict(const cv::Point2f armor_box_points[4], int id, lon
 
 // 不使用预测模式，仅发送相机坐标系下目标坐标【相对坐标】
 bool PredictorKalman::none_predict(const cv::Point2f armor_box_points[4], int id, long long int t, cv::Mat &im2show) {
-    double robot_speed_mps = 18.0; // TODO: 应当通过下位机知晓当前发射初速度（m/s）
+    double robot_speed_mps = 30.0; // TODO: 应当通过下位机知晓当前发射初速度（m/s）
     Eigen::Vector3d m_pc = pnp_get_pc(armor_box_points, id);  // point camera: 目标在相机坐标系下的坐标
-//    m_pc(2,0) /= 2;
 
     double mc_yaw = std::atan2(m_pc(1,0), m_pc(0,0));    // yaw的测量值，单位弧度
 //    std::cout << "mc_yaw=" << mc_yaw * 180. / M_PI <<std::endl;
