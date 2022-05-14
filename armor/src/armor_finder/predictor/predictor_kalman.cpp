@@ -109,33 +109,33 @@ bool PredictorKalman::predict(const cv::Point2f armor_box_points[4], int id, lon
     // TODO: 若能通过陀螺仪知晓当前云台姿态角度，则注释这段
     //////////////////////////////////////////////////////////////////////////
     // 在线可视化四元数转欧拉角 https://quaternions.online/
-//    q_[0] =  0.500;
-//    q_[1] =  -0.500; // 示例欧拉角XYZ（-90，90，0）
-//    q_[2] =  0.500;
-//    q_[3] =  -0.500;
+    q_[0] =  0.500;
+    q_[1] =  -0.500; // 示例欧拉角XYZ（-90，90，0）
+    q_[2] =  0.500;
+    q_[3] =  -0.500;
 
 //    q_[0] =  0.0;
 //    q_[1] =  0.00; // 示例欧拉角XYZ
 //    q_[2] =  0.00;
 //    q_[3] =  1.00;
-//
-//
-//    Eigen::Quaternionf q_raw(q_[0], q_[1], q_[2], q_[3]);
-//    Eigen::Quaternionf q(q_raw.matrix().transpose());
-////	std::cout<<q_[0]<<q_[1]<<q_[2]<<q_[3]<<std::endl; // 显示陀螺仪姿态数据
-//    Eigen::Matrix3d R_IW = q.matrix().cast<double>();
+
+
+    Eigen::Quaternionf q_raw(q_[0], q_[1], q_[2], q_[3]);
+    Eigen::Quaternionf q(q_raw.matrix().transpose());
+//	std::cout<<q_[0]<<q_[1]<<q_[2]<<q_[3]<<std::endl; // 显示陀螺仪姿态数据
+    Eigen::Matrix3d R_IW = q.matrix().cast<double>();
 ///////////////////////////////////////////////////////////////////////////////
-    Eigen::Matrix3d R_IW = euler2RotationMatrix(0,0,0);
+//    Eigen::Matrix3d R_IW = euler2RotationMatrix(0,0,0);
     // TODO: 这里会出现时间戳不对齐
 
-    Eigen::Vector3d ea(0, 0, 0);
-
-    //3.1 欧拉角转换为旋转矩阵
-    Eigen::Matrix3d rotation_matrix3;
-    rotation_matrix3 = Eigen::AngleAxisd(ea[0], Eigen::Vector3d::UnitZ()) *
-                       Eigen::AngleAxisd(ea[1], Eigen::Vector3d::UnitY()) *
-                       Eigen::AngleAxisd(ea[2], Eigen::Vector3d::UnitX());
-    cout << "rotation matrix3 =\n" << rotation_matrix3 << endl;
+//    Eigen::Vector3d ea(0, 0, 0);
+//
+//    //3.1 欧拉角转换为旋转矩阵
+//    Eigen::Matrix3d rotation_matrix3;
+//    rotation_matrix3 = Eigen::AngleAxisd(ea[0], Eigen::Vector3d::UnitZ()) *
+//                       Eigen::AngleAxisd(ea[1], Eigen::Vector3d::UnitY()) *
+//                       Eigen::AngleAxisd(ea[2], Eigen::Vector3d::UnitX());
+//    cout << "rotation matrix3 =\n" << rotation_matrix3 << endl;
 
 
 //    Eigen::Matrix3d R_IW = euler2RotationMatrix(0.0, mcu_data.curr_pitch*180/PI, mcu_data.curr_yaw*180/PI); //通过下位机数据获取当前云台旋转矩阵(左正右负)
@@ -212,14 +212,15 @@ bool PredictorKalman::predict(const cv::Point2f armor_box_points[4], int id, lon
     double pitch_angle = s_pitch;
     double yaw_speed = c_speed;
 
-//// TODO: 数据文件写入用于分析
+////// TODO: 数据文件写入用于分析
 //    ofstream outFile;
-//    outFile.open(PROJECT_SOURCE_DIR"../kf_data_sample.txt", ios::app);//保存的文件名
-//    outFile<<to_string(m_yaw / M_PI * 180) + " " +to_string(c_yaw / M_PI * 180)+ " " + to_string(p_yaw / M_PI * 180) ;
+//    outFile.open(PROJECT_DIR"/distance_data.txt", ios::app);//保存的文件名
+////    outFile<<to_string(m_yaw / M_PI * 180) + " " +to_string(c_yaw / M_PI * 180)+ " " + to_string(p_yaw / M_PI * 180) ;
+//    outFile<<to_string(distance);
 //    outFile<<"\n";
 //    outFile.close();//关闭文件写入流
 
-//	std::cout << "yaw角度: " << yaw_angle << " pitch角度: " << pitch_angle << " yaw速度: " << yaw_speed << " 距离 " << distance << std::endl;
+	std::cout << "yaw角度: " << yaw_angle << " pitch角度: " << pitch_angle << " yaw速度: " << yaw_speed << " 距离 " << distance << std::endl;
     sendTarget(serial, yaw_angle, pitch_angle, distance);
     return true;
 
@@ -229,6 +230,8 @@ bool PredictorKalman::predict(const cv::Point2f armor_box_points[4], int id, lon
 bool PredictorKalman::none_predict(const cv::Point2f armor_box_points[4], int id, long long int t, cv::Mat &im2show) {
     double robot_speed_mps = 18.0; // TODO: 应当通过下位机知晓当前发射初速度（m/s）
     Eigen::Vector3d m_pc = pnp_get_pc(armor_box_points, id);  // point camera: 目标在相机坐标系下的坐标
+//    m_pc(2,0) /= 2;
+
     double mc_yaw = std::atan2(m_pc(1,0), m_pc(0,0));    // yaw的测量值，单位弧度
 //    std::cout << "mc_yaw=" << mc_yaw * 180. / M_PI <<std::endl;
 
@@ -279,8 +282,8 @@ bool PredictorKalman::none_predict(const cv::Point2f armor_box_points[4], int id
 //    outFile<<"\n";
 //    outFile.close();//关闭文件写入流
 
-	std::cout << "yaw角度: " << yaw_angle << " pitch角度: " << pitch_angle  << " 距离 " << distance << std::endl;
-    sendTarget(serial, yaw_angle, pitch_angle, distance);
+	std::cout << "yaw角度: " << yaw_angle*2 << " pitch角度: " << pitch_angle*2  << " 距离 " << distance/2.0 << std::endl;
+    sendTarget(serial, yaw_angle*2, pitch_angle*2, distance/2.0);
     return true;
 
 }
@@ -288,20 +291,26 @@ bool PredictorKalman::none_predict(const cv::Point2f armor_box_points[4], int id
 
 Eigen::Vector3d PredictorKalman::pnp_get_pc(const cv::Point2f p[4], int armor_number) {
     static const std::vector<cv::Point3d> pw_small = {  // 单位：m
-            {-0.066, 0.027,  0.},
-            {-0.066, -0.027, 0.},
+            {0.066,  0.027,  0.},
             {0.066,  -0.027, 0.},
-            {0.066,  0.027,  0.}
+            {-0.066, -0.027, 0.},
+            {-0.066, 0.027,  0.}
+//            {0.030,  0.013,  0.},
+//            {0.030,  -0.013, 0.},
+//            {-0.030, -0.013, 0.},
+//            {-0.030, 0.013,  0.}
     };
     static const std::vector<cv::Point3d> pw_big = {    // 单位：m
-            {-0.115, 0.029,  0.},
-            {-0.115, -0.029, 0.},
-            {0.115,  -0.029, 0.},
-            {0.115,  0.029,  0.}
+            {-0.1, 0.029,  0.},
+            {-0.1, -0.029, 0.},
+            {0.1,  -0.029, 0.},
+            {0.1,  0.029,  0.}
     };
     std::vector<cv::Point2d> pu(p, p + 4);
-    cv::Mat rvec, tvec;
+    std::cout << "4 Points:"<<pu<< std::endl;
 
+
+    cv::Mat rvec, tvec;
     if (armor_number >= 8){ // 由于分类序号原因，这里仅获得实际的数字编号 （详细分类参阅 armor_finder.cpp）
         armor_number -= 7;}
     if (armor_number == 1 || armor_number == 7 || armor_number == 8) {  // 当编号为【1、英雄  7、哨兵 8、基地】时，判定目标为大装甲板，其余情况均为小装甲板
@@ -312,6 +321,7 @@ Eigen::Vector3d PredictorKalman::pnp_get_pc(const cv::Point2f p[4], int armor_nu
         cv::solvePnP(pw_small, pu, F_MAT, C_MAT, rvec, tvec);
 //        cout << " 当前目标是小装甲" << endl;
     }
+//    std::cout << "trev:"<<tvec/2.0<< std::endl;
 
     Eigen::Vector3d pc;
     cv::cv2eigen(tvec, pc);
