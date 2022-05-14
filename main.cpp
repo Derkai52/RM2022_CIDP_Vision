@@ -71,7 +71,6 @@ int main(int argc, char *argv[]) {
         mcu_data.enemy_color = ENEMY_RED;
     else
         mcu_data.enemy_color = ENEMY_BLUE;
-    mcu_data.enemy_color = ENEMY_BLUE;
 
     // 根据条件输入选择视频源 (1、海康相机  0、视频文件)
     int from_camera = 1; // 默认视频源
