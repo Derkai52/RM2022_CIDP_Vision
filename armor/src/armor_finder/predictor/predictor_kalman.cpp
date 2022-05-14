@@ -228,8 +228,50 @@ bool PredictorKalman::predict(const cv::Point2f armor_box_points[4], int id, lon
 
 // 不使用预测模式，仅发送相机坐标系下目标坐标【相对坐标】
 bool PredictorKalman::none_predict(const cv::Point2f armor_box_points[4], int id, long long int t, cv::Mat &im2show) {
-    double robot_speed_mps = 30.0; // TODO: 应当通过下位机知晓当前发射初速度（m/s）
+    double robot_speed_mps = 16.0; // TODO: 应当通过下位机知晓当前发射初速度（m/s）
     Eigen::Vector3d m_pc = pnp_get_pc(armor_box_points, id);  // point camera: 目标在相机坐标系下的坐标
+
+
+
+
+    //    - 单位 mm
+    //    - 云台与相机 相机作为参考点
+    double ptz_camera_x; //    PTZ_CAMERA_X - 相机与云台的 X 轴偏移(左负右正)
+    double ptz_camera_y; //    PTZ_CAMERA_Y - 相机与云台的 Y 轴偏移(上负下正)
+    double ptz_camera_z; //    PTZ_CAMERA_Z - 相机与云台的 Z 轴偏移(前正后负)
+
+    static double theta = 0; // 定义相机旋转角度
+    // 定义旋转矩阵
+    static double r_data[] = {1, 0,           0,
+                              0, cos(theta),  sin(theta),
+                              0, -sin(theta), cos(theta)};
+    // 定义平移矩阵
+    static double t_data[] = {static_cast<double>(ptz_camera_x),
+                              static_cast<double>(ptz_camera_y),
+                              static_cast<double>(ptz_camera_z)};
+
+    Eigen::Matrix<double, 3, 3> r_camera_ptz = Eigen::Matrix<double, 3, 3>(r_data);
+    Eigen::Vector3d t_camera_ptz = Eigen::Vector3d(t_data);
+
+//std::cout <<"旋转矩阵："<<t_camera_ptz << std::endl;
+//std::cout <<"平移矩阵："<<t_camera_ptz << std::endl;
+std::cout <<"变换前矩阵："<<m_pc << std::endl;
+    m_pc = r_camera_ptz * m_pc - t_camera_ptz; // 相机坐标系 转换为 云台坐标系
+
+    std::cout <<"变换后矩阵："<<m_pc << std::endl;
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     double mc_yaw = std::atan2(m_pc(1,0), m_pc(0,0));    // yaw的测量值，单位弧度
 //    std::cout << "mc_yaw=" << mc_yaw * 180. / M_PI <<std::endl;
@@ -269,7 +311,7 @@ bool PredictorKalman::none_predict(const cv::Point2f armor_box_points[4], int id
     cv::circle(im2show, {im2show.cols / 2, im2show.rows / 2}, 3, {0, 255 ,0}); // 图像中心点（绿色）
 
     double s_yaw = atan(s_pw(0, 0) / s_pw(2, 0)) / M_PI * 180.;
-    double s_pitch = atan(s_pw(1, 0) / s_pw(2, 0)) / M_PI * 180.;
+    double s_pitch = atan(h_pw(1, 0) / h_pw(2, 0)) / M_PI * 180.;
     // 绘制角度波形图
     double yaw_angle = s_yaw;
     double pitch_angle = s_pitch;
