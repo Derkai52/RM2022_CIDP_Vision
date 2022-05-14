@@ -102,6 +102,54 @@ Eigen::Quaterniond euler2Quaternion(double roll, double pitch, double yaw) {
 }
 
 
+
+/**
+ * @brief 计算子弹下坠
+ *
+ * @param _dist         目标深度
+ * @param _tvec_y       目标高度
+ * @param _ballet_speed 子弹速度
+ * @param _company      计算单位
+ * @return float        返回补偿角度
+ * @author XX
+ */
+float getPitch(float       _dist,
+               float       _tvec_y,
+               float       _ballet_speed,
+               const int   _company = 1) {
+    // 选择计算单位
+    _dist         /= _company;
+    _tvec_y       /= _company;
+    _ballet_speed /= _company;
+
+    float       y_temp   = _tvec_y;
+    float       y_actual = 0.f;
+    float       dy       = 0.f;
+    float       a        = 0.f;
+    const float gravity  = 10000.f / _company;
+
+    for (size_t i = 0; i != 20; ++i) {
+        a = static_cast<float>(atan2(y_temp, _dist));
+        // 子弹飞行时间
+        float t =  (float((exp( 0.001 * _dist)-1) / ( 0.001 * _dist * 0.001 * _ballet_speed * cos(a))));
+        // float t = _dist / _ballet_speed * cos(a);
+
+        y_actual  = _ballet_speed * sin(a) * t - gravity * t * t / 2; // 补偿重力后重新计算的子弹落点距离
+        dy        = _tvec_y - y_actual;
+        y_temp   += dy;
+
+        if (fabsf(dy) < 1e-2) { break; }
+    }
+
+    return a;
+}
+
+
+
+
+
+
+
 bool PredictorKalman::predict(const cv::Point2f armor_box_points[4], int id, long long int t, cv::Mat &im2show) {
     std::array<double, 4> q_;  // 初始化云台当前姿态角
     double robot_speed_mps = 18.0; // TODO: 应当通过下位机知晓当前发射初速度（m/s）
@@ -182,7 +230,7 @@ bool PredictorKalman::predict(const cv::Point2f armor_box_points[4], int id, lon
     double p_pitch = std::atan2(p_pw(2, 0), distance_xy);
 //    std::cout << state << std::endl;
 
-    // 计算抛物线，先解二次方程
+//     计算抛物线，先解二次方程
     double a = 9.8 * 9.8 * 0.25;
     double b = -robot_speed_mps * robot_speed_mps - distance * 9.8 * cos(M_PI_2 + p_pitch);
     double c = distance * distance;
@@ -262,18 +310,6 @@ std::cout <<"变换前矩阵："<<m_pc << std::endl;
     std::cout <<"变换后矩阵："<<m_pc << std::endl;
 
 
-
-
-
-
-
-
-
-
-
-
-
-
     double mc_yaw = std::atan2(m_pc(1,0), m_pc(0,0));    // yaw的测量值，单位弧度
 //    std::cout << "mc_yaw=" << mc_yaw * 180. / M_PI <<std::endl;
 
@@ -282,6 +318,7 @@ std::cout <<"变换前矩阵："<<m_pc << std::endl;
     Eigen::Vector3d c_pw{length * cos(mc_yaw), length * sin(mc_yaw), m_pc(2, 0)}; //反解位置(世界坐标系)
 
     double distance = c_pw.norm();                          // 目标距离（单位:m）
+    float result_pitch = getPitch(distance*cos(mcu_data.curr_pitch), distance*sin(mcu_data.curr_pitch), 17.6);
     double distance_xy = c_pw.topRows<2>().norm();
     double p_pitch = std::atan2(c_pw(2, 0), distance_xy);
 //    std::cout << p_pitch<<std::endl;
@@ -324,8 +361,8 @@ std::cout <<"变换前矩阵："<<m_pc << std::endl;
 //    outFile<<"\n";
 //    outFile.close();//关闭文件写入流
 
-	std::cout << "yaw角度: " << yaw_angle*2 << " pitch角度: " << pitch_angle*2  << " 距离 " << distance/2.0 << std::endl;
-    sendTarget(serial, yaw_angle*2, pitch_angle*2, distance/2.0);
+	std::cout << "yaw角度: " << yaw_angle*2 << " pitch角度: " << result_pitch  << " 距离 " << distance/2.0 << std::endl;
+    sendTarget(serial, yaw_angle*2, result_pitch, distance/2.0);
     return true;
 
 }
