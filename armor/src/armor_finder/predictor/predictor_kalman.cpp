@@ -172,6 +172,7 @@ bool PredictorKalman::predict(const cv::Point2f armor_box_points[4], int id, lon
     double p_yaw = c_yaw + atan2(predict_time * c_speed, m_pw.norm());     // yaw的预测值，直线位移转为角度，单位弧度
 //  cout << "滤波值："<<c_yaw <<" | 预测值："<< p_yaw <<" | 预测时间："<<predict_time<<" | 目标距离："<< m_pw.norm()<<endl;
 
+
     double length = sqrt(m_pw(0, 0) * m_pw(0, 0) + m_pw(1, 0) * m_pw(1, 0));
     Eigen::Vector3d c_pw{length * cos(c_yaw), length * sin(c_yaw), m_pw(2, 0)};//反解位置(世界坐标系)
     Eigen::Vector3d p_pw{length * cos(p_yaw), length * sin(p_yaw), m_pw(2, 0)};
