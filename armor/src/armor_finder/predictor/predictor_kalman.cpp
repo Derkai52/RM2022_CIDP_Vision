@@ -149,7 +149,7 @@ float getPitch(float       _dist,
 
 
 
-
+// 使用预测模式，通过电控下位机云台位姿解算出目标坐标【绝对坐标】
 bool PredictorKalman::predict(const cv::Point2f armor_box_points[4], int id, long long int t, cv::Mat &im2show) {
     std::array<double, 4> q_;  // 初始化云台当前姿态角
     double robot_speed_mps = 18.0; // TODO: 应当通过下位机知晓当前发射初速度（m/s）
@@ -275,19 +275,16 @@ bool PredictorKalman::predict(const cv::Point2f armor_box_points[4], int id, lon
 
 }
 
+
 // 不使用预测模式，仅发送相机坐标系下目标坐标【相对坐标】
 bool PredictorKalman::none_predict(const cv::Point2f armor_box_points[4], int id, long long int t, cv::Mat &im2show) {
     double robot_speed_mps = 16.0; // TODO: 应当通过下位机知晓当前发射初速度（m/s）
     Eigen::Vector3d m_pc = pnp_get_pc(armor_box_points, id);  // point camera: 目标在相机坐标系下的坐标
 
-
-
-
-    //    - 单位 mm
-    //    - 云台与相机 相机作为参考点
-    double ptz_camera_x; //    PTZ_CAMERA_X - 相机与云台的 X 轴偏移(左负右正)
-    double ptz_camera_y; //    PTZ_CAMERA_Y - 相机与云台的 Y 轴偏移(上负下正)
-    double ptz_camera_z; //    PTZ_CAMERA_Z - 相机与云台的 Z 轴偏移(前正后负)
+    // 相机坐标系转换为云台坐标系
+    double ptz_camera_x = 0;       //    PTZ_CAMERA_X - 相机与云台的 X 轴偏移(左负右正) 【云台与相机 相机作为参考点 单位mm】
+    double ptz_camera_y = -130.5;  //    PTZ_CAMERA_Y - 相机与云台的 Y 轴偏移(上负下正)
+    double ptz_camera_z = -100;    //    PTZ_CAMERA_Z - 相机与云台的 Z 轴偏移(前正后负)
 
     static double theta = 0; // 定义相机旋转角度
     // 定义旋转矩阵
@@ -302,11 +299,8 @@ bool PredictorKalman::none_predict(const cv::Point2f armor_box_points[4], int id
     Eigen::Matrix<double, 3, 3> r_camera_ptz = Eigen::Matrix<double, 3, 3>(r_data);
     Eigen::Vector3d t_camera_ptz = Eigen::Vector3d(t_data);
 
-//std::cout <<"旋转矩阵："<<t_camera_ptz << std::endl;
-//std::cout <<"平移矩阵："<<t_camera_ptz << std::endl;
-std::cout <<"变换前矩阵："<<m_pc << std::endl;
+    std::cout <<"变换前矩阵："<<m_pc << std::endl;
     m_pc = r_camera_ptz * m_pc - t_camera_ptz; // 相机坐标系 转换为 云台坐标系
-
     std::cout <<"变换后矩阵："<<m_pc << std::endl;
 
 
