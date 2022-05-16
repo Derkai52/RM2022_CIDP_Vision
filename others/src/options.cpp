@@ -34,7 +34,7 @@ std::map<std::string, std::pair<std::string, void(*)(void)>> options = {
     {"--show-armor-box", {
         "show the aim box.", []() {
             show_armor_box = true;
-//            armor_predictor = true;
+            armor_predictor = true;
             LOGM("Enable show armor box");
         }
     }},
@@ -124,7 +124,7 @@ std::map<std::string, std::pair<std::string, void(*)(void)>> options = {
             LOGM("Enable show processed image");
             show_energy = true;
             LOGM("Enable show energy part");
-//            armor_predictor = true;
+            armor_predictor = true;
 
             }
     }}

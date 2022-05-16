@@ -32,7 +32,7 @@ static bool lengthJudge(const LightBlob &light_blob_i, const LightBlob &light_bl
 
 // 判断两个灯条的长度比
 static bool lengthRatioJudge(const LightBlob &light_blob_i, const LightBlob &light_blob_j) {
-    return (light_blob_i.length / light_blob_j.length < 2.5
+    return (light_blob_i.length / light_blob_j.length < 2.7
             && light_blob_i.length / light_blob_j.length > 0.4);
 }
 

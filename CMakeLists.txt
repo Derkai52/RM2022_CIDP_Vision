@@ -19,12 +19,12 @@ endif()
 
 add_compile_definitions(PROJECT_DIR="${PROJECT_SOURCE_DIR}")
 
-FIND_PROGRAM(CCACHE_FOUND ccache) # ccache编译器缓存
-IF(CCACHE_FOUND)
-    SET_PROPERTY(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ccache)
-    SET_PROPERTY(GLOBAL PROPERTY RULE_LAUNCH_LINK ccache)
-    MESSAGE("< Use ccache for compiler >")
-ENDIF()
+#FIND_PROGRAM(CCACHE_FOUND ccache) # ccache编译器缓存
+#IF(CCACHE_FOUND)
+#    SET_PROPERTY(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ccache)
+#    SET_PROPERTY(GLOBAL PROPERTY RULE_LAUNCH_LINK ccache)
+#    MESSAGE("< Use ccache for compiler >")
+#ENDIF()
 
 FIND_PACKAGE(Eigen3 REQUIRED)
 FIND_PACKAGE(OpenCV 4 REQUIRED) # 数字根据实际使用opencv版本更改,例如opencv3.X就改为3，opencv4.X就改为4

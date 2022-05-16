@@ -8,7 +8,7 @@
 
 #define PROJECT_SOURCE_DIR
 extern McuData mcu_data;     // 下位机数据
-constexpr double shoot_delay = 0.09;   // 射击延迟: 90ms
+constexpr double shoot_delay = 0.15;   // 射击延迟: 90ms
 
 PredictorKalman::PredictorKalman() {
     // 1、初始化相机内参、坐标系转换关系
@@ -81,8 +81,8 @@ Eigen::Matrix3d euler2RotationMatrix(double roll, double pitch, double yaw) {
     Eigen::Quaterniond q = rollAngle*yawAngle*pitchAngle;
 //    Eigen::Quaterniond q = pitchAngle*yawAngle*rollAngle;
     Eigen::Matrix3d R = q.matrix().cast<double>();
-    cout << "Euler2RotationMatrix result is:" <<endl;
-    cout << "R = " << R <<endl;
+//    cout << "Euler2RotationMatrix result is:" <<endl;
+//    cout << "R = " << R <<endl;
     return R;
 }
 
@@ -101,62 +101,43 @@ Eigen::Quaterniond euler2Quaternion(double roll, double pitch, double yaw) {
     return q;
 }
 
+// 四元数转欧拉角
+Eigen::Vector3d Quaterniond2Euler(const double x,const double y,const double z,const double w)
+{
+    Eigen::Quaterniond q;
+    q.x() = x;
+    q.y() = y;
+    q.z() = z;
+    q.w() = w;
 
-
-/**
- * @brief 计算子弹下坠
- *
- * @param _dist         目标深度
- * @param _tvec_y       目标高度
- * @param _ballet_speed 子弹速度
- * @param _company      计算单位
- * @return float        返回补偿角度
- * @author XX
- */
-float getPitch(float       _dist,
-               float       _tvec_y,
-               float       _ballet_speed,
-               const int   _company = 1) {
-    // 选择计算单位
-    _dist         /= _company;
-    _tvec_y       /= _company;
-    _ballet_speed /= _company;
-
-    float       y_temp   = _tvec_y;
-    float       y_actual = 0.f;
-    float       dy       = 0.f;
-    float       a        = 0.f;
-    const float gravity  = 10000.f / _company;
-
-    for (size_t i = 0; i != 20; ++i) {
-        a = static_cast<float>(atan2(y_temp, _dist));
-        // 子弹飞行时间
-        float t =  (float((exp( 0.001 * _dist)-1) / ( 0.001 * _dist * 0.001 * _ballet_speed * cos(a))));
-        // float t = _dist / _ballet_speed * cos(a);
-
-        y_actual  = _ballet_speed * sin(a) * t - gravity * t * t / 2; // 补偿重力后重新计算的子弹落点距离
-        dy        = _tvec_y - y_actual;
-        y_temp   += dy;
-
-        if (fabsf(dy) < 1e-2) { break; }
-    }
-
-    return a;
+    Eigen::Vector3d euler = q.toRotationMatrix().eulerAngles(2, 1, 0);
+    cout << "Quaterniond2Euler result is:" <<endl;
+    cout << "x="  << euler[2] << endl ;
+    cout << "y="  << euler[1] << endl ;
+    cout << "z="  << euler[0] << endl << endl;
 }
 
+// 旋转矩阵转欧拉角
+Eigen::Vector3d RotationMatrix2euler(Eigen::Matrix3d R)
+{
+    Eigen::Matrix3d m;
+    m = R;
+    Eigen::Vector3d euler = m.eulerAngles(0, 1, 2);
+    cout << "RotationMatrix2euler result is:" <<endl;
+    cout << "x="  << euler[2] << endl ;
+    cout << "y="  << euler[1] << endl ;
+    cout << "z="  << euler[0] << endl << endl;
+    return euler;
+}
 
-
-
-
-
-
+// 使用预测模式
 bool PredictorKalman::predict(const cv::Point2f armor_box_points[4], int id, long long int t, cv::Mat &im2show) {
     std::array<double, 4> q_;  // 初始化云台当前姿态角
-    double robot_speed_mps = 18.0; // TODO: 应当通过下位机知晓当前发射初速度（m/s）
+    double robot_speed_mps = 17.0; // TODO: 应当通过下位机知晓当前发射初速度（m/s）
 
     // TODO: 若能通过陀螺仪知晓当前云台姿态角度，则注释这段
     //////////////////////////////////////////////////////////////////////////
-    // 在线可视化四元数转欧拉角 https://quaternions.online/
+//    // 在线可视化四元数转欧拉角 https://quaternions.online/
     q_[0] =  0.500;
     q_[1] =  -0.500; // 示例欧拉角XYZ（-90，90，0）
     q_[2] =  0.500;
@@ -166,34 +147,31 @@ bool PredictorKalman::predict(const cv::Point2f armor_box_points[4], int id, lon
 //    q_[1] =  0.00; // 示例欧拉角XYZ
 //    q_[2] =  0.00;
 //    q_[3] =  1.00;
-
+//    Eigen::Quaterniond q_1 = euler2Quaternion(0.0, mcu_data.curr_pitch*180/PI, mcu_data.curr_yaw*180/PI);
+//    Eigen::Vector3d eul = Quaterniond2Euler(q_1.x(), q_1.y(), q_1.z(), q_1.w());
+//    	std::cout<<eul<<std::endl; // 显示陀螺仪姿态数据
 
     Eigen::Quaternionf q_raw(q_[0], q_[1], q_[2], q_[3]);
+//    Eigen::Quaternionf q_raw(q_1.w(), q_1.x(), q_1.y(), q_1.z());
     Eigen::Quaternionf q(q_raw.matrix().transpose());
 //	std::cout<<q_[0]<<q_[1]<<q_[2]<<q_[3]<<std::endl; // 显示陀螺仪姿态数据
     Eigen::Matrix3d R_IW = q.matrix().cast<double>();
+//    	std::cout<<R_IW<<std::endl; // 显示陀螺仪姿态数据
+
 ///////////////////////////////////////////////////////////////////////////////
-//    Eigen::Matrix3d R_IW = euler2RotationMatrix(0,0,0);
-    // TODO: 这里会出现时间戳不对齐
 
-//    Eigen::Vector3d ea(0, 0, 0);
-//
-//    //3.1 欧拉角转换为旋转矩阵
-//    Eigen::Matrix3d rotation_matrix3;
-//    rotation_matrix3 = Eigen::AngleAxisd(ea[0], Eigen::Vector3d::UnitZ()) *
-//                       Eigen::AngleAxisd(ea[1], Eigen::Vector3d::UnitY()) *
-//                       Eigen::AngleAxisd(ea[2], Eigen::Vector3d::UnitX());
-//    cout << "rotation matrix3 =\n" << rotation_matrix3 << endl;
-
-
-//    Eigen::Matrix3d R_IW = euler2RotationMatrix(0.0, mcu_data.curr_pitch*180/PI, mcu_data.curr_yaw*180/PI); //通过下位机数据获取当前云台旋转矩阵(左正右负)
     Eigen::Vector3d m_pc = pnp_get_pc(armor_box_points, id);  // point camera: 目标在相机坐标系下的坐标
     Eigen::Vector3d m_pw = pc_to_pw(m_pc, R_IW);          // point world: 目标在世界坐标系下的坐标。（世界坐标系:陀螺仪的全局世界坐标系）
+    m_pw(0, 0) /=2;
 
     static double last_yaw = 0, last_speed = 0;
     double mc_yaw = std::atan2(m_pc(1,0), m_pc(0,0));
     double m_yaw = std::atan2(m_pw(1, 0), m_pw(0, 0));   // yaw的测量值，单位弧度
-//    std::cout << "m_yaw=" << m_yaw * 180. / M_PI <<std::endl;
+//    std::cout << m_pw(1, 0) << std::endl;
+//    std::cout << "m_yaw=" <<m_yaw* 180. / M_PI <<" curr_yaw: " <<mcu_data.curr_yaw* 180. / M_PI<< " fusion: "<< ((m_yaw* 180. / M_PI+(mcu_data.curr_yaw * 180. / M_PI))) <<std::endl;
+//    std::cout << "m_yaw=" <<m_yaw* 180. / M_PI <<"  : " <<-(m_yaw+(mcu_data.curr_yaw+(4*M_PI/180.)))* 180. / M_PI <<std::endl;
+
+    m_yaw = (m_yaw+mcu_data.curr_yaw);
 
     // TODO: 需要增加对（陀螺方向与移动方向相同）移动陀螺的鉴别，否则会超调
     if(std::fabs(last_yaw - m_yaw) > 5. / 180. * M_PI){  // 两帧解算的Yaw超过5度则认为出现新目标，重置卡尔曼的状态值
@@ -209,11 +187,11 @@ bool PredictorKalman::predict(const cv::Point2f armor_box_points[4], int id, lon
     last_speed = state(1, 0);
     double c_yaw = state(0, 0);                                      // current yaw: yaw的滤波值，单位弧度
     double c_speed = state(1, 0) * m_pw.norm();                      // current speed: 角速度转线速度，单位m/s
-//    std::cout << "[m_yaw测量值=" << m_yaw * 180. / M_PI<< "] [c_yaw滤波值: " << c_yaw * 180. / M_PI << "] [c_speed线速度:" << c_speed << std::endl;
+//    std::cout << "[m_yaw测量值=" << m_yaw * 180. / M_PI<< "] [c_yaw滤波值: " << c_yaw * 180. / M_PI << "] [c_speed线速度:" << c_speed <<" LLLL: "<<m_pw.norm()<< std::endl;
 //    std::cout << "t: " << t << " state(1, 0): " << state(1, 0) << std::endl;
 
 //   线速度比例补偿
-    double compensate_speed = c_speed * 1.1;
+    double compensate_speed = c_speed * 2.5;
     c_speed += compensate_speed;
 
     double predict_time = m_pw.norm() / robot_speed_mps + shoot_delay;        // 预测时间=飞行时间+发射延迟（单位:s）
@@ -269,25 +247,30 @@ bool PredictorKalman::predict(const cv::Point2f armor_box_points[4], int id, lon
 //    outFile<<"\n";
 //    outFile.close();//关闭文件写入流
 
-	std::cout << "yaw角度: " << yaw_angle << " pitch角度: " << pitch_angle << " yaw速度: " << yaw_speed << " 距离 " << distance << std::endl;
-    sendTarget(serial, yaw_angle, pitch_angle, distance);
+	std::cout << "yaw角度: " << yaw_angle+mcu_data.curr_yaw/ M_PI * 180 << " pitch角度: " << -pitch_angle << " yaw速度: " << yaw_speed << " 距离 " << distance << std::endl;
+    sendTarget(serial, yaw_angle+mcu_data.curr_yaw/ M_PI * 180, -pitch_angle, distance);
     return true;
 
 }
 
+
+double cur_distance; //
+double last_distance; //
+bool define_last_distance= false;
 // 不使用预测模式，仅发送相机坐标系下目标坐标【相对坐标】
 bool PredictorKalman::none_predict(const cv::Point2f armor_box_points[4], int id, long long int t, cv::Mat &im2show) {
-    double robot_speed_mps = 16.0; // TODO: 应当通过下位机知晓当前发射初速度（m/s）
+    double robot_speed_mps = 20.0; // TODO: 应当通过下位机知晓当前发射初速度（m/s）
     Eigen::Vector3d m_pc = pnp_get_pc(armor_box_points, id);  // point camera: 目标在相机坐标系下的坐标
 
 
+    // 相机坐标系转换为云台坐标系
+    double ptz_camera_x = 0;       //    PTZ_CAMERA_X - 相机与云台的 X 轴偏移(左负右正) 【云台与相机 相机作为参考点 单位m】
+    double ptz_camera_y = 0.050;   //    PTZ_CAMERA_Y - 相机与云台的 Y 轴偏移(上负下正)
+    double ptz_camera_z = 0.100;   //    PTZ_CAMERA_Z - 相机与云台的 Z 轴偏移(前正后负)
 
-
-    //    - 单位 mm
-    //    - 云台与相机 相机作为参考点
-    double ptz_camera_x; //    PTZ_CAMERA_X - 相机与云台的 X 轴偏移(左负右正)
-    double ptz_camera_y; //    PTZ_CAMERA_Y - 相机与云台的 Y 轴偏移(上负下正)
-    double ptz_camera_z; //    PTZ_CAMERA_Z - 相机与云台的 Z 轴偏移(前正后负)
+//    double ptz_camera_x = 0;     //    PTZ_CAMERA_X - 相机与云台的 X 轴偏移(左负右正) 【云台与相机 相机作为参考点 单位mm】
+//    double ptz_camera_y = 0;     //    PTZ_CAMERA_Y - 相机与云台的 Y 轴偏移(上负下正)
+//    double ptz_camera_z = 0;     //    PTZ_CAMERA_Z - 相机与云台的 Z 轴偏移(前正后负)
 
     static double theta = 0; // 定义相机旋转角度
     // 定义旋转矩阵
@@ -304,10 +287,10 @@ bool PredictorKalman::none_predict(const cv::Point2f armor_box_points[4], int id
 
 //std::cout <<"旋转矩阵："<<t_camera_ptz << std::endl;
 //std::cout <<"平移矩阵："<<t_camera_ptz << std::endl;
-std::cout <<"变换前矩阵："<<m_pc << std::endl;
+//std::cout <<"变换前矩阵："<<m_pc << std::endl;
     m_pc = r_camera_ptz * m_pc - t_camera_ptz; // 相机坐标系 转换为 云台坐标系
 
-    std::cout <<"变换后矩阵："<<m_pc << std::endl;
+//    std::cout <<"变换后矩阵："<<m_pc << std::endl;
 
 
     double mc_yaw = std::atan2(m_pc(1,0), m_pc(0,0));    // yaw的测量值，单位弧度
@@ -316,12 +299,15 @@ std::cout <<"变换前矩阵："<<m_pc << std::endl;
     double predict_time = m_pc.norm() / robot_speed_mps + shoot_delay;        // 预测时间=飞行时间+发射延迟（单位:s）【未使用】
     double length = sqrt(m_pc(0, 0) * m_pc(0, 0) + m_pc(1, 0) * m_pc(1, 0));
     Eigen::Vector3d c_pw{length * cos(mc_yaw), length * sin(mc_yaw), m_pc(2, 0)}; //反解位置(世界坐标系)
+    double distance = c_pw.norm()/2;                          // 目标距离（单位:m）
 
-    double distance = c_pw.norm();                          // 目标距离（单位:m）
-    float result_pitch = getPitch(distance*cos(mcu_data.curr_pitch), distance*sin(mcu_data.curr_pitch), 17.6);
+
+
     double distance_xy = c_pw.topRows<2>().norm();
     double p_pitch = std::atan2(c_pw(2, 0), distance_xy);
-//    std::cout << p_pitch<<std::endl;
+
+//        std::cout <<"distance_xy: "<<distance_xy<<"distance: "<<distance<<endl;
+
     // 弹道解算，计算抛物线，先解二次方程
     double a = 9.8 * 9.8 * 0.25;
     double b = -robot_speed_mps * robot_speed_mps - distance * 9.8 * cos(M_PI_2 + p_pitch);
@@ -354,15 +340,28 @@ std::cout <<"变换前矩阵："<<m_pc << std::endl;
     double yaw_angle = s_yaw;
     double pitch_angle = s_pitch;
 
+    if (!define_last_distance){
+        last_distance = distance; // frist define
+        define_last_distance = true;
+    }
+
+    cur_distance = distance;
+    double lowPass=0.8;
+    // 超过3m 的目标，使用低通滤波，平滑距离噪声
+    if( distance > 3){
+        cur_distance = last_distance * lowPass + cur_distance * (1 - lowPass);
+    }
+    last_distance = cur_distance;
+
 //// TODO: 数据文件写入用于分析
 //    ofstream outFile;
-//    outFile.open(PROJECT_SOURCE_DIR"../kf_data_sample.txt", ios::app);//保存的文件名
-//    outFile<<to_string(m_yaw / M_PI * 180) + " " +to_string(c_yaw / M_PI * 180)+ " " + to_string(p_yaw / M_PI * 180) ;
+//    outFile.open(PROJECT_DIR"/distance_filter_1_data.txt", ios::app);//保存的文件名
+//    outFile<<to_string(cur_distance);
 //    outFile<<"\n";
 //    outFile.close();//关闭文件写入流
 
-	std::cout << "yaw角度: " << yaw_angle*2 << " pitch角度: " << result_pitch  << " 距离 " << distance/2.0 << std::endl;
-    sendTarget(serial, yaw_angle*2, result_pitch, distance/2.0);
+	std::cout << "yaw角度: " << yaw_angle << " pitch角度: " << -pitch_angle  << " 距离 " << cur_distance << " cur_mcu_pitch: "<<mcu_data.curr_pitch*180/PI<<std::endl;
+    sendTarget(serial, yaw_angle, -pitch_angle, cur_distance);
     return true;
 
 }
@@ -374,19 +373,21 @@ Eigen::Vector3d PredictorKalman::pnp_get_pc(const cv::Point2f p[4], int armor_nu
             {0.066,  -0.027, 0.},
             {-0.066, -0.027, 0.},
             {-0.066, 0.027,  0.}
-//            {0.030,  0.013,  0.},
-//            {0.030,  -0.013, 0.},
-//            {-0.030, -0.013, 0.},
-//            {-0.030, 0.013,  0.}
+
     };
     static const std::vector<cv::Point3d> pw_big = {    // 单位：m
-            {-0.1, 0.029,  0.},
-            {-0.1, -0.029, 0.},
-            {0.1,  -0.029, 0.},
-            {0.1,  0.029,  0.}
+//            {-0.1, 0.027,  0.},
+//            {-0.1, -0.027, 0.},
+//            {0.1,  -0.027, 0.},
+//            {0.1,  0.027,  0.}
+            {0.1,  0.027,  0.},
+            {0.1,  -0.027, 0.},
+            {-0.1, -0.027, 0.},
+            {-0.1, 0.027,  0.}
+
     };
     std::vector<cv::Point2d> pu(p, p + 4);
-    std::cout << "4 Points:"<<pu<< std::endl;
+//    std::cout << "4 Points:"<<pu<< std::endl;
 
 
     cv::Mat rvec, tvec;
