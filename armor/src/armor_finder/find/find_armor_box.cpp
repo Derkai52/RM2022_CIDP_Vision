@@ -16,6 +16,7 @@ static bool angelJudge(const LightBlob &light_blob_i, const LightBlob &light_blo
     return abs(angle_i - angle_j) < 20;
 }
 
+
 // 判断两个灯条的高度差
 static bool heightJudge(const LightBlob &light_blob_i, const LightBlob &light_blob_j) {
     cv::Point2f centers = light_blob_i.rect.center - light_blob_j.rect.center;
