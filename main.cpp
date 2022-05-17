@@ -57,12 +57,13 @@ PredictorKalman predictor;       // 初始化卡尔曼
 cv::Mat ori_src;
 
 // 自瞄主程序对象
-ArmorFinder armor_finder(mcu_data.enemy_color, serial, PROJECT_DIR"/tools/para1/", false);
+ArmorFinder armor_finder(mcu_data.enemy_color, serial, PROJECT_DIR"/tools/para/", false);
 // 能量机关主程序对象
 Energy energy(serial, mcu_data.enemy_color);
 
 
 int main(int argc, char *argv[]) {
+    // TODO: camera correct fix
     processOptions(argc, argv);             // 处理命令行参数
     thread receive(uartReceive, &serial);   // 开启串口接收线程
 
@@ -71,8 +72,9 @@ int main(int argc, char *argv[]) {
         mcu_data.enemy_color = ENEMY_RED;
     else
         mcu_data.enemy_color = ENEMY_BLUE;
-//    mcu_data.enemy_color = ENEMY_BLUE;
+//    mcu_data.enemy_color = ENEMY_RED;
 
+int e_c = static_cast<int>(mcu_data.enemy_color);
     // 根据条件输入选择视频源 (1、海康相机  0、视频文件)
     int from_camera = 1; // 默认视频源
 //    if (!run_with_camera) {
@@ -92,6 +94,8 @@ int main(int argc, char *argv[]) {
         }
     }
 
+//    cout << e_c << endl;
+
     while (true) {
         // 从相机捕获一帧图像
         if (from_camera) {
@@ -103,6 +107,8 @@ int main(int argc, char *argv[]) {
         }
         flip(ori_src, ori_src, -1); // 图像翻转（视实际相机安装情况）# TODO:记得改回来！
 
+
+//        cout << e_c << endl;
 
 //        char curr_state = mcu_data.state; // # TODO:记得改回来！
         char curr_state = ARMOR_STATE;

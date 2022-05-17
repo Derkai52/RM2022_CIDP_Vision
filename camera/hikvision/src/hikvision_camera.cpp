@@ -36,7 +36,7 @@ namespace camera {
             BurstFrameCount = config_file["BurstFrameCount"].as<int>();
             ExposureMode = config_file["ExposureMode"].as<int>();
             ExposureTime = config_file["ExposureTime"].as<int>();
-            GammaEnable = config_file["FrameRateEnable"].as<bool>();
+            GammaEnable = config_file["GammaEnable"].as<bool>();
             Gamma = config_file["Gamma"].as<float>();
             GainAuto = config_file["GainAuto"].as<int>();
             Gain = config_file["Gain"].as<float>();

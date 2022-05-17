@@ -7,10 +7,10 @@ FrameRate: 100
 BurstFrameCount: 1
 ExposureMode: 0
 ExposureTime: 3000
-GammaEnable: false
+GammaEnable: true
 Gamma: 0.7
 GainAuto: 2
-Gain: 7
+Gain: 10
 SaturationEnable: false
 Saturation: 128
 BalanceWhiteMode: 0

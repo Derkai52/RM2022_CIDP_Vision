@@ -167,12 +167,12 @@ bool PredictorKalman::predict(const cv::Point2f armor_box_points[4], int id, lon
     static double last_yaw = 0, last_speed = 0;
     double mc_yaw = std::atan2(m_pc(1,0), m_pc(0,0));
     double m_yaw = std::atan2(m_pw(1, 0), m_pw(0, 0));   // yaw的测量值，单位弧度
-//    std::cout << m_pw(1, 0) << std::endl;
-//    std::cout << "m_yaw=" <<m_yaw* 180. / M_PI <<" curr_yaw: " <<mcu_data.curr_yaw* 180. / M_PI<< " fusion: "<< ((m_yaw* 180. / M_PI+(mcu_data.curr_yaw * 180. / M_PI))) <<std::endl;
-//    std::cout << "m_yaw=" <<m_yaw* 180. / M_PI <<"  : " <<-(m_yaw+(mcu_data.curr_yaw+(4*M_PI/180.)))* 180. / M_PI <<std::endl;
+//    std::cout << m_pw(0, 0) << std::endl;
+    std::cout << "m_yaw=" <<m_yaw* 180. / M_PI <<" curr_yaw: " <<mcu_data.curr_yaw* 180. / M_PI<< " fusion: "<< ((m_yaw* 180. / M_PI+(mcu_data.curr_yaw * 180. / M_PI))) <<std::endl;
+//    std::cout << "m_yaw=" <<m_yaw* 180. / M_PI <<"  : " <<(m_yaw+(mcu_data.curr_yaw+(*M_PI/180.)))* 180. / M_PI <<std::endl;
 
     m_yaw = (m_yaw+mcu_data.curr_yaw);
-
+//    std::cout << "m_yaw=" <<m_yaw* 180. / M_PI << std::endl;
     // TODO: 需要增加对（陀螺方向与移动方向相同）移动陀螺的鉴别，否则会超调
     if(std::fabs(last_yaw - m_yaw) > 5. / 180. * M_PI){  // 两帧解算的Yaw超过5度则认为出现新目标，重置卡尔曼的状态值
         kalman.reset(m_yaw, t);
@@ -191,8 +191,8 @@ bool PredictorKalman::predict(const cv::Point2f armor_box_points[4], int id, lon
 //    std::cout << "t: " << t << " state(1, 0): " << state(1, 0) << std::endl;
 
 //   线速度比例补偿
-    double compensate_speed = c_speed * 2.5;
-    c_speed += compensate_speed;
+//    double compensate_speed = c_speed * 1.1;
+//    c_speed += compensate_speed;
 
     double predict_time = m_pw.norm() / robot_speed_mps + shoot_delay;        // 预测时间=飞行时间+发射延迟（单位:s）
     double p_yaw = c_yaw + atan2(predict_time * c_speed, m_pw.norm());     // yaw的预测值，直线位移转为角度，单位弧度
@@ -247,7 +247,7 @@ bool PredictorKalman::predict(const cv::Point2f armor_box_points[4], int id, lon
 //    outFile<<"\n";
 //    outFile.close();//关闭文件写入流
 
-	std::cout << "yaw角度: " << yaw_angle+mcu_data.curr_yaw/ M_PI * 180 << " pitch角度: " << -pitch_angle << " yaw速度: " << yaw_speed << " 距离 " << distance << std::endl;
+//	std::cout << "yaw角度: " << yaw_angle+mcu_data.curr_yaw/ M_PI * 180 << " pitch角度: " << -pitch_angle << " yaw速度: " << yaw_speed << " 距离 " << distance << std::endl;
     sendTarget(serial, yaw_angle+mcu_data.curr_yaw/ M_PI * 180, -pitch_angle, distance);
     return true;
 
