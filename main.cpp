@@ -36,6 +36,7 @@
 using namespace cv;
 using namespace std;
 using namespace camera;
+using std::this_thread::sleep_for;
 
 // 从下位机接收的数据
 McuData mcu_data = {
@@ -61,9 +62,12 @@ ArmorFinder armor_finder(mcu_data.enemy_color, serial, PROJECT_DIR"/tools/para/"
 // 能量机关主程序对象
 Energy energy(serial, mcu_data.enemy_color);
 
+double bind_yaw = mcu_data.curr_yaw;
+double bind_pitch = mcu_data.curr_pitch;
+extern double bind_yaw;
+extern double bind_pitch;
 
 int main(int argc, char *argv[]) {
-    // TODO: camera correct fix
     processOptions(argc, argv);             // 处理命令行参数
     thread receive(uartReceive, &serial);   // 开启串口接收线程
 
@@ -72,9 +76,7 @@ int main(int argc, char *argv[]) {
         mcu_data.enemy_color = ENEMY_RED;
     else
         mcu_data.enemy_color = ENEMY_BLUE;
-//    mcu_data.enemy_color = ENEMY_RED;
 
-int e_c = static_cast<int>(mcu_data.enemy_color);
     // 根据条件输入选择视频源 (1、海康相机  0、视频文件)
     int from_camera = 1; // 默认视频源
 //    if (!run_with_camera) {
@@ -94,9 +96,11 @@ int e_c = static_cast<int>(mcu_data.enemy_color);
         }
     }
 
-//    cout << e_c << endl;
-
+    cout << "\x1B[2J\x1B[H"; // 程序开始前清空终端区显示
     while (true) {
+        bind_yaw = mcu_data.curr_yaw; // 获取程序开始时下位机云台姿态数据（yaw），用于图像-时间戳 对齐
+        bind_pitch = mcu_data.curr_pitch; // 获取程序开始时下位机云台姿态数据（yaw），用于图像-时间戳 对齐
+
         // 从相机捕获一帧图像
         if (from_camera) {
             MVS_cap.ReadImg(ori_src);
@@ -105,15 +109,27 @@ int e_c = static_cast<int>(mcu_data.enemy_color);
         } else {
             video->read(ori_src);
         }
-        flip(ori_src, ori_src, -1); // 图像翻转（视实际相机安装情况）# TODO:记得改回来！
+//        flip(ori_src, ori_src, -1); // 图像翻转（视实际相机安装情况）# TODO:记得改回来！
 
+        // 测量程序耗时并限制程序最大帧率
+        static float nowTime_ms = 0.0f, deltaTime_ms = 0.0f, lastTime_ms = 0.0f, sleep_time = 0.0f, vision_max_hz = 100.0f;
+        nowTime_ms = cv::getTickCount() / cv::getTickFrequency() * 1000;	//ms
+        deltaTime_ms = (float)(nowTime_ms - lastTime_ms);				    //ms
+        lastTime_ms = nowTime_ms;
+        DebugT(30, 1,"帧率:" <<std::left<<setw(5)<< 1000.0/deltaTime_ms);
+        DebugT(40, 1," 程序耗时:"<<std::left<<setw(11)<<deltaTime_ms<<"ms");
+        if (deltaTime_ms < (1000.0/vision_max_hz)) {
+            sleep_time = ((1000.0/vision_max_hz)-deltaTime_ms)*1000.0;
+//            usleep(sleep_time); // ms
+        }
 
-//        cout << e_c << endl;
-
-//        char curr_state = mcu_data.state; // # TODO:记得改回来！
+        //        char curr_state = mcu_data.state; // # TODO:记得改回来！
         char curr_state = ARMOR_STATE;
         CNT_TIME("Total", {
             if (curr_state != ARMOR_STATE) {  // 能量机关模式
+                DebugT(1, 1,"目标颜色:" << (int)mcu_data.enemy_color << " 图像源:"<< from_camera<< " 当前模式: 能量机关" ); // 右边
+                DebugT(1, 2,"云台姿态 Yaw:" << bind_yaw*180.0/M_PI << "  "<<"Pitch:"<<bind_pitch*180.0/M_PI); // 右边
+
                 if (last_state == ARMOR_STATE) {//若上一帧不是大能量机关模式，即刚往完成切换，则需要初始化
                     destroyAllWindows();
 
@@ -130,7 +146,7 @@ int e_c = static_cast<int>(mcu_data.enemy_color);
                 }
                 extract(ori_src);  // 画幅 resize
                 if (save_video) saveVideos(ori_src); // 保存视频
-                if (show_origin) showOrigin(ori_src);// 显示原始图像
+                showOrigin(ori_src);// 显示原始图像
                 energy.run(ori_src);
             }
 

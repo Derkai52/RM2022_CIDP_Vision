@@ -5,6 +5,10 @@
 #include <systime.h>
 #include <serial.h>
 #include <opencv2/core.hpp>
+
+// 刷新终端的Debug显示(c：行  r：列  str：刷新内容)
+#define DebugT(c, r, str) std::cout << "\033["<< r << ";"<< c <<"H" << str << "\033[1m" << std::endl;  // TODO: 格式化输出应当限定输出位置的长度，否则会出现旧信息不被更新
+
 // 单片机端回传数据结构体
 struct McuData {
     float curr_yaw;      // 当前云台yaw角度

@@ -67,6 +67,7 @@ static void imagePreProcess(cv::Mat &src){
 
 // 在给定图像上寻找所有可能的灯条
 bool ArmorFinder::findLightBlobs(const cv::Mat &src, LightBlobs &light_blobs) {
+
     cv::Mat color_channel;
     cv::Mat src_bin_light, src_bin_dim;
     std::vector<cv::Mat> channels;       // 通道拆分
@@ -108,9 +109,12 @@ bool ArmorFinder::findLightBlobs(const cv::Mat &src, LightBlobs &light_blobs) {
         if (hierarchy_light[i][2] == -1) {
             cv::RotatedRect rect = cv::minAreaRect(light_contours_light[i]);
             if (isValidLightBlob(light_contours_light[i], rect)) {
+
                 light_blobs_light.emplace_back(
                         rect, areaRatio(light_contours_light[i], rect), get_blob_color(src, rect)
                 );
+
+
             }
         }
     }

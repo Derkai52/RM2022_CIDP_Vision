@@ -57,7 +57,7 @@ void ArmorFinder::run(cv::Mat &src) {
     getsystime(frame_time); //　获取当前帧时间(不是足够精确)
 //    stateSearchingTarget(src);  // for debug
 //    goto end;
-    switch (state) {
+    switch (SEARCHING_STATE) {
         case SEARCHING_STATE: // 搜寻模式
             if (stateSearchingTarget(src)) {
                 if ((target_box.rect & cv::Rect2d(0, 0, 640, 480)) == target_box.rect) { // 判断装甲板区域是否脱离图像区域
@@ -67,10 +67,10 @@ void ArmorFinder::run(cv::Mat &src) {
                         cv::threshold(roi_gray, roi_gray, 180, 255, cv::THRESH_BINARY);  // 画面高亮区域筛选
                         contour_area = cv::countNonZero(roi_gray); // 【已弃用，判断图像是否全黑】
                     }
-                    tracker = TrackerToUse::create();            // 成功搜寻到装甲板，创建tracker对象
-                    tracker->init(src, target_box.rect);   // 跟踪器初始化,延迟速度视画面目标大小影响
+//                    tracker = TrackerToUse::create();            // 成功搜寻到装甲板，创建tracker对象
+//                    tracker->init(src, target_box.rect);   // 跟踪器初始化,延迟速度视画面目标大小影响
 
-                    state = TRACKING_STATE;
+                    state = SEARCHING_STATE;
                     tracking_cnt = 0;
                     LOGM(STR_CTR(WORD_LIGHT_CYAN, "into track"));
                 }
@@ -105,7 +105,6 @@ end:
         cv::line(src, cvPoint(320,0),cvPoint(320,480),(180,255,100),2);
         cv::line(src, cvPoint(0,240),cvPoint(640,240),(180,255,100),2);
         showArmorBox("box", src, target_box);
-        cv::waitKey(1);
     }
-}
 
+}

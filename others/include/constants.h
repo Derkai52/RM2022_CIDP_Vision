@@ -16,6 +16,6 @@
 #define FOCUS_PIXAL_8MM  (1488)
 #define FOCUS_PIXAL_5MM  (917) // TODO:需要补充更多镜头焦段的测试
 #define FOCUS_PIXAL_6MM  ()
-#define FOCUS_PIXAL      FOCUS_PIXAL_5MM
+#define FOCUS_PIXAL      FOCUS_PIXAL_8MM
 
 #endif /* _CONSTANTS_H */

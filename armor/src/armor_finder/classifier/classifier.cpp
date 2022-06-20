@@ -30,6 +30,7 @@ vector<vector<MatrixXd>> Classifier::load_conv_w(const string &file){
         }
         result.emplace_back(sub);
     }
+
     return result;
 }
 
@@ -70,7 +71,7 @@ MatrixXd Classifier::load_fc_w(const string &file){
 }
 
 VectorXd Classifier::load_fc_b(const string &file){
-    FILE *fp = fopen(file.data(), "r");
+ FILE *fp = fopen(file.data(), "r");
     if(fp == nullptr){
         LOGE("%s open fail!", file.data());
         state = false;

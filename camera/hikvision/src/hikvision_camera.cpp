@@ -32,7 +32,7 @@ namespace camera {
             width = config_file["width"].as<int>();
             height = config_file["height"].as<int>();
             FrameRateEnable = config_file["FrameRateEnable"].as<bool>();
-            FrameRate = config_file["FrameRate"].as<int>();
+            FrameRate = config_file["FrameRate"].as<float>();
             BurstFrameCount = config_file["BurstFrameCount"].as<int>();
             ExposureMode = config_file["ExposureMode"].as<int>();
             ExposureTime = config_file["ExposureTime"].as<int>();
@@ -507,7 +507,12 @@ namespace camera {
         if (frame_empty) {
             image = cv::Mat();
         } else {
-            image = camera::frame.clone();
+            static Mat last_last_last_img, last_last_img, last_img;
+            image = last_img;
+//            last_img = last_last_img;
+//            last_last_img = last_last_last_img;
+            last_img = camera::frame.clone();
+//            image = camera::frame.clone();
             frame_empty = 1;
         }
         pthread_mutex_unlock(&mutex);  // 释放线程锁

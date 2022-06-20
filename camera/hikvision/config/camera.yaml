@@ -2,8 +2,8 @@ width: 1440
 height: 1080
 Offset_x: 0
 Offset_y: 0
-FrameRateEnable: false
-FrameRate: 100
+FrameRateEnable: true
+FrameRate: 100.0
 BurstFrameCount: 1
 ExposureMode: 0
 ExposureTime: 3000

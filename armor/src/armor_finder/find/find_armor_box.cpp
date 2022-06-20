@@ -4,7 +4,6 @@
 #include <opencv2/highgui.hpp>
 
 #define DO_NOT_CNT_TIME
-
 #include <log.h>
 
 // 判断两个灯条的角度差
@@ -145,6 +144,9 @@ bool ArmorFinder::findArmorBox(const cv::Mat &src, ArmorBox &box) {
                 cv::Mat roi = src(armor_box.rect).clone();
                 cv::resize(roi, roi, cv::Size(48, 36));
                 int c = classifier(roi);
+                if (c == RED2 || c == BLUE2){ // TODO : Warning  这里强行不识别工程
+                    c = 0;
+                }
                 armor_box.id = c;
             }
         }, armor_boxes.size());
@@ -164,25 +166,29 @@ bool ArmorFinder::findArmorBox(const cv::Mat &src, ArmorBox &box) {
             }
         }
 
-        // 保存有效的装甲板图作为标签(需要去others/src/options.cpp 修改设置开启)
-        if (save_labelled_boxes) {
-            for (const auto &one_box : armor_boxes) {
-                char filename[100];
-                sprintf(filename, PROJECT_DIR"/armor_box_photo/%s_%d.jpg", id2name[one_box.id].data(),
-                        time(nullptr) + clock());
-                auto box_roi = src(one_box.rect);
-                cv::resize(box_roi, box_roi, cv::Size(48, 36));
-                cv::imwrite(filename, box_roi);
-            }
-        }
         if (box.rect == cv::Rect2d(0, 0, 0, 0)) {
             return false;
         }
         if (show_armor_boxes && state==SEARCHING_STATE) {
             showArmorBoxesClass("class", src, armor_boxes);
         }
-    } else { // 如果分类器不可用，则直接选取候选区中的第一个区域作为目标(往往会误识别)
+    }
+    else { // 如果分类器不可用，则直接选取候选区中的第一个区域作为目标(往往会误识别)
         box = armor_boxes[0];
+    }
+
+    // 保存有效的装甲板图作为标签(需要去others/src/options.cpp 修改设置开启)
+    if (save_labelled_boxes) {
+        for (const auto &one_box : armor_boxes) {
+            char filename[100];
+//                sprintf(filename, PROJECT_DIR"/armor_save_box/%s_%d.jpg", id2name[one_box.id].data(),
+//                        time(nullptr) + clock());
+            sprintf(filename, PROJECT_DIR"/armor_save_box/NO/%d.jpg", time(nullptr) + clock());
+
+            auto box_roi = src(one_box.rect);
+            cv::resize(box_roi, box_roi, cv::Size(48, 36));
+            cv::imwrite(filename, box_roi);
+        }
     }
     return true;
 }

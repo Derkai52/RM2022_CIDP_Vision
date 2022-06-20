@@ -96,6 +96,7 @@ void showOrigin(const cv::Mat &src) {
     } else return;
 }
 
+\
 void extract(cv::Mat &src) {//图像预处理，将视频切成640×480的大小
     if (src.empty()) return;
     float length = static_cast<float>(src.cols);

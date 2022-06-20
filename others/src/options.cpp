@@ -14,6 +14,7 @@ bool wait_uart = false;        // 串口检测
 bool save_labelled_boxes = false;  // 数据集采集模式
 bool show_process = false;     // 显示能量机关图
 bool show_energy = false;      // 显示能量机关
+bool show_energy_predict = false; // 显示能量机关预测打击点
 bool save_mark = false;        // 保存能量机关标志点
 bool show_info = false;        // 仅终端显示目标信息
 bool run_by_frame = false;     // 图像源仅使用视频流
@@ -95,6 +96,7 @@ std::map<std::string, std::pair<std::string, void(*)(void)>> options = {
     {"--show-energy", {
         "",[](){
             show_energy = true;
+            show_energy_predict = true;
             LOGM("Enable show energy part!");
         }
     }},

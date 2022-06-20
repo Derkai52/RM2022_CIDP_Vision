@@ -40,8 +40,10 @@ INCLUDE_DIRECTORIES(${EIGEN3_INCLUDE_DIR})
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/energy/include)
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/armor/include)
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/others/include)
+INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/angle)
 
-FILE(GLOB_RECURSE sourcefiles "others/src/*.cpp" "energy/src/*cpp" "armor/src/*.cpp")
+
+FILE(GLOB_RECURSE sourcefiles "others/src/*.cpp" "energy/src/*cpp" "armor/src/*.cpp"  "angle/*.cpp")
 FILE(GLOB_RECURSE Hiksourcefiles "${HIKVISION_CAMERA_DIR}/src/*.cpp" "${HIKVISION_CAMERA_DIR}/tool/src/*.cpp") # 海康相机拓展工具文件
 ADD_EXECUTABLE(${BIN_NAME} main.cpp ${sourcefiles} ${Hiksourcefiles})
 

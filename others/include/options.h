@@ -18,6 +18,7 @@ extern bool wait_uart;
 extern bool save_labelled_boxes;
 extern bool show_process;
 extern bool show_energy;
+extern bool show_energy_predict;
 extern bool save_mark;
 extern bool show_info;
 extern bool run_by_frame;

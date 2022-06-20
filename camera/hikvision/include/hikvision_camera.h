@@ -76,7 +76,7 @@ namespace camera
         int Offset_x;
         int Offset_y;
         bool FrameRateEnable;
-        int FrameRate;
+        float FrameRate;
         int BurstFrameCount;
 
         int ExposureMode;
