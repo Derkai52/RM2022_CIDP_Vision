@@ -9,9 +9,7 @@
 ### 自瞄装甲板识别
 ![自瞄](doc/resource/readme_doc/autoaim.png)
 
-首先对图像进行通道拆分以及二值化操作，再进行开闭运算，通过边缘提取和条件限制得出可能为灯条的部分。再对所有可能的灯条进行两两匹配，根据形状大小特性进行筛选，得出可能为装甲板的候选区。然后把所有候选区交给分类器判断，得出真实的装甲板及其数字id。最后根据优先级选取最终击打目标以及后续处理。
-
-### 1、BenchMark 测试用例
+### 1、测试用例
 
 > 运算设备：Intel NUC8i7
 >
@@ -26,7 +24,7 @@
 >
 >相机驱动下载：[海康机器人开发下载中心](https://www.hikrobotics.com/cn/machinevision/service/download?module=0)
 >
->OpenCV库：推荐OpenCV4.1及以上(最低支持OpenCV3.4.5)
+>
 >
 >Eigen库下载: sudo apt install libeigen3-dev
 
