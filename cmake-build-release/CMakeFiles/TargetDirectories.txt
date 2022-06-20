@@ -1,0 +1,5 @@
+/home/tk/Desktop/rm2022_cidp_vision/cmake-build-release/CMakeFiles/rebuild_cache.dir
+/home/tk/Desktop/rm2022_cidp_vision/cmake-build-release/CMakeFiles/run.dir
+/home/tk/Desktop/rm2022_cidp_vision/cmake-build-release/CMakeFiles/create-startup.dir
+/home/tk/Desktop/rm2022_cidp_vision/cmake-build-release/CMakeFiles/train-cnn.dir
+/home/tk/Desktop/rm2022_cidp_vision/cmake-build-release/CMakeFiles/edit_cache.dir

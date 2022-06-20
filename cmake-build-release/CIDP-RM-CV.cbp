@@ -1,0 +1,328 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6"/>
+	<Project>
+		<Option title="CIDP-RM-CV"/>
+		<Option makefile_is_custom="1"/>
+		<Option compiler="gcc"/>
+		<Option virtualFolders="CMake Files\;CMake Files\..\;CMake Files\..\..\;CMake Files\..\..\..\;CMake Files\..\..\..\..\;CMake Files\..\..\..\..\usr\;CMake Files\..\..\..\..\usr\lib\;CMake Files\..\..\..\..\usr\lib\cmake\;CMake Files\..\..\..\..\usr\lib\cmake\eigen3\;CMake Files\..\..\..\..\usr\local\;CMake Files\..\..\..\..\usr\local\lib\;CMake Files\..\..\..\..\usr\local\lib\cmake\;CMake Files\..\..\..\..\usr\local\lib\cmake\opencv4\;"/>
+		<Build>
+			<Target title="all">
+				<Option working_dir="/home/tk/Desktop/rm2022_cidp_vision/cmake-build-release"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j12 -f &quot;/home/tk/Desktop/rm2022_cidp_vision/cmake-build-release/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="/usr/bin/make -j12 -f &quot;/home/tk/Desktop/rm2022_cidp_vision/cmake-build-release/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j12 -f &quot;/home/tk/Desktop/rm2022_cidp_vision/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j12 -f &quot;/home/tk/Desktop/rm2022_cidp_vision/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="rebuild_cache">
+				<Option working_dir="/home/tk/Desktop/rm2022_cidp_vision/cmake-build-release"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j12 -f &quot;/home/tk/Desktop/rm2022_cidp_vision/cmake-build-release/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
+					<CompileFile command="/usr/bin/make -j12 -f &quot;/home/tk/Desktop/rm2022_cidp_vision/cmake-build-release/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j12 -f &quot;/home/tk/Desktop/rm2022_cidp_vision/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j12 -f &quot;/home/tk/Desktop/rm2022_cidp_vision/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="run">
+				<Option output="/home/tk/Desktop/rm2022_cidp_vision/cmake-build-release/run" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/tk/Desktop/rm2022_cidp_vision/cmake-build-release"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DHIK_CONFIG_FILE_PATH=&quot;/home/tk/Desktop/rm2022_cidp_vision/camera/hikvision/config&quot;"/>
+					<Add option="-DHIK_CALI_FILE_PATH=&quot;/home/tk/Desktop/rm2022_cidp_vision/camera/hikvision/config/cameraCaliData&quot;"/>
+					<Add option="-DPROJECT_DIR=&quot;/home/tk/Desktop/rm2022_cidp_vision&quot;"/>
+					<Add directory="/home/tk/Desktop/rm2022_cidp_vision/camera/hikvision/include"/>
+					<Add directory="/home/tk/Desktop/rm2022_cidp_vision/camera/hikvision/tool/include"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/home/tk/Desktop/rm2022_cidp_vision/energy/include"/>
+					<Add directory="/home/tk/Desktop/rm2022_cidp_vision/armor/include"/>
+					<Add directory="/home/tk/Desktop/rm2022_cidp_vision/others/include"/>
+					<Add directory="/home/tk/Desktop/rm2022_cidp_vision/angle"/>
+					<Add directory="/usr/local/include/opencv4"/>
+					<Add directory="/usr/include/c++/7"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/7"/>
+					<Add directory="/usr/include/c++/7/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j12 -f &quot;/home/tk/Desktop/rm2022_cidp_vision/cmake-build-release/Makefile&quot;  VERBOSE=1 run"/>
+					<CompileFile command="/usr/bin/make -j12 -f &quot;/home/tk/Desktop/rm2022_cidp_vision/cmake-build-release/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j12 -f &quot;/home/tk/Desktop/rm2022_cidp_vision/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j12 -f &quot;/home/tk/Desktop/rm2022_cidp_vision/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="run/fast">
+				<Option output="/home/tk/Desktop/rm2022_cidp_vision/cmake-build-release/run" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/tk/Desktop/rm2022_cidp_vision/cmake-build-release"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DHIK_CONFIG_FILE_PATH=&quot;/home/tk/Desktop/rm2022_cidp_vision/camera/hikvision/config&quot;"/>
+					<Add option="-DHIK_CALI_FILE_PATH=&quot;/home/tk/Desktop/rm2022_cidp_vision/camera/hikvision/config/cameraCaliData&quot;"/>
+					<Add option="-DPROJECT_DIR=&quot;/home/tk/Desktop/rm2022_cidp_vision&quot;"/>
+					<Add directory="/home/tk/Desktop/rm2022_cidp_vision/camera/hikvision/include"/>
+					<Add directory="/home/tk/Desktop/rm2022_cidp_vision/camera/hikvision/tool/include"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/home/tk/Desktop/rm2022_cidp_vision/energy/include"/>
+					<Add directory="/home/tk/Desktop/rm2022_cidp_vision/armor/include"/>
+					<Add directory="/home/tk/Desktop/rm2022_cidp_vision/others/include"/>
+					<Add directory="/home/tk/Desktop/rm2022_cidp_vision/angle"/>
+					<Add directory="/usr/local/include/opencv4"/>
+					<Add directory="/usr/include/c++/7"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/7"/>
+					<Add directory="/usr/include/c++/7/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j12 -f &quot;/home/tk/Desktop/rm2022_cidp_vision/cmake-build-release/Makefile&quot;  VERBOSE=1 run/fast"/>
+					<CompileFile command="/usr/bin/make -j12 -f &quot;/home/tk/Desktop/rm2022_cidp_vision/cmake-build-release/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j12 -f &quot;/home/tk/Desktop/rm2022_cidp_vision/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j12 -f &quot;/home/tk/Desktop/rm2022_cidp_vision/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="create-startup">
+				<Option working_dir="/home/tk/Desktop/rm2022_cidp_vision/cmake-build-release"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j12 -f &quot;/home/tk/Desktop/rm2022_cidp_vision/cmake-build-release/Makefile&quot;  VERBOSE=1 create-startup"/>
+					<CompileFile command="/usr/bin/make -j12 -f &quot;/home/tk/Desktop/rm2022_cidp_vision/cmake-build-release/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j12 -f &quot;/home/tk/Desktop/rm2022_cidp_vision/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j12 -f &quot;/home/tk/Desktop/rm2022_cidp_vision/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="train-cnn">
+				<Option working_dir="/home/tk/Desktop/rm2022_cidp_vision/cmake-build-release"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j12 -f &quot;/home/tk/Desktop/rm2022_cidp_vision/cmake-build-release/Makefile&quot;  VERBOSE=1 train-cnn"/>
+					<CompileFile command="/usr/bin/make -j12 -f &quot;/home/tk/Desktop/rm2022_cidp_vision/cmake-build-release/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j12 -f &quot;/home/tk/Desktop/rm2022_cidp_vision/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j12 -f &quot;/home/tk/Desktop/rm2022_cidp_vision/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="edit_cache">
+				<Option working_dir="/home/tk/Desktop/rm2022_cidp_vision/cmake-build-release"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j12 -f &quot;/home/tk/Desktop/rm2022_cidp_vision/cmake-build-release/Makefile&quot;  VERBOSE=1 edit_cache"/>
+					<CompileFile command="/usr/bin/make -j12 -f &quot;/home/tk/Desktop/rm2022_cidp_vision/cmake-build-release/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j12 -f &quot;/home/tk/Desktop/rm2022_cidp_vision/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j12 -f &quot;/home/tk/Desktop/rm2022_cidp_vision/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Unit filename="/home/tk/Desktop/rm2022_cidp_vision/angle/CoordinateSolver/ArmorCoordinateSolver.cpp">
+			<Option target="run"/>
+		</Unit>
+		<Unit filename="/home/tk/Desktop/rm2022_cidp_vision/angle/CoordinateSolver/ArmorCoordinateSolver.h">
+			<Option target="run"/>
+		</Unit>
+		<Unit filename="/home/tk/Desktop/rm2022_cidp_vision/angle/CoordinateSolver/BuffCoordinateSolver.cpp">
+			<Option target="run"/>
+		</Unit>
+		<Unit filename="/home/tk/Desktop/rm2022_cidp_vision/angle/CoordinateSolver/BuffCoordinateSolver.h">
+			<Option target="run"/>
+		</Unit>
+		<Unit filename="/home/tk/Desktop/rm2022_cidp_vision/angle/KalmanPredict/KalmanPredict.cpp">
+			<Option target="run"/>
+		</Unit>
+		<Unit filename="/home/tk/Desktop/rm2022_cidp_vision/angle/KalmanPredict/KalmanPredict.h">
+			<Option target="run"/>
+		</Unit>
+		<Unit filename="/home/tk/Desktop/rm2022_cidp_vision/angle/PNP/PNPSolver.cpp">
+			<Option target="run"/>
+		</Unit>
+		<Unit filename="/home/tk/Desktop/rm2022_cidp_vision/angle/PNP/PNPSolver.h">
+			<Option target="run"/>
+		</Unit>
+		<Unit filename="/home/tk/Desktop/rm2022_cidp_vision/angle/angleFactory.cpp">
+			<Option target="run"/>
+		</Unit>
+		<Unit filename="/home/tk/Desktop/rm2022_cidp_vision/angle/angleFactory.h">
+			<Option target="run"/>
+		</Unit>
+		<Unit filename="/home/tk/Desktop/rm2022_cidp_vision/armor/src/armor_finder/anti_top/anti_top.cpp">
+			<Option target="run"/>
+		</Unit>
+		<Unit filename="/home/tk/Desktop/rm2022_cidp_vision/armor/src/armor_finder/armor_box/armor_box.cpp">
+			<Option target="run"/>
+		</Unit>
+		<Unit filename="/home/tk/Desktop/rm2022_cidp_vision/armor/src/armor_finder/armor_finder.cpp">
+			<Option target="run"/>
+		</Unit>
+		<Unit filename="/home/tk/Desktop/rm2022_cidp_vision/armor/src/armor_finder/classifier/classifier.cpp">
+			<Option target="run"/>
+		</Unit>
+		<Unit filename="/home/tk/Desktop/rm2022_cidp_vision/armor/src/armor_finder/find/find_armor_box.cpp">
+			<Option target="run"/>
+		</Unit>
+		<Unit filename="/home/tk/Desktop/rm2022_cidp_vision/armor/src/armor_finder/find/find_light_blobs.cpp">
+			<Option target="run"/>
+		</Unit>
+		<Unit filename="/home/tk/Desktop/rm2022_cidp_vision/armor/src/armor_finder/predictor/predictor_kalman.cpp">
+			<Option target="run"/>
+		</Unit>
+		<Unit filename="/home/tk/Desktop/rm2022_cidp_vision/armor/src/armor_finder/predictor/tool_bak.cpp">
+			<Option target="run"/>
+		</Unit>
+		<Unit filename="/home/tk/Desktop/rm2022_cidp_vision/armor/src/armor_finder/searching_state/searching_state.cpp">
+			<Option target="run"/>
+		</Unit>
+		<Unit filename="/home/tk/Desktop/rm2022_cidp_vision/armor/src/armor_finder/send_target/send_target.cpp">
+			<Option target="run"/>
+		</Unit>
+		<Unit filename="/home/tk/Desktop/rm2022_cidp_vision/armor/src/armor_finder/standby_state/standby_state.cpp">
+			<Option target="run"/>
+		</Unit>
+		<Unit filename="/home/tk/Desktop/rm2022_cidp_vision/armor/src/armor_finder/tracking_state/tracking_state.cpp">
+			<Option target="run"/>
+		</Unit>
+		<Unit filename="/home/tk/Desktop/rm2022_cidp_vision/armor/src/show_images/show_images.cpp">
+			<Option target="run"/>
+		</Unit>
+		<Unit filename="/home/tk/Desktop/rm2022_cidp_vision/camera/hikvision/src/hikvision_camera.cpp">
+			<Option target="run"/>
+		</Unit>
+		<Unit filename="/home/tk/Desktop/rm2022_cidp_vision/camera/hikvision/tool/src/calibration/cameraCalibration.cpp">
+			<Option target="run"/>
+		</Unit>
+		<Unit filename="/home/tk/Desktop/rm2022_cidp_vision/camera/hikvision/tool/src/debug/camera_parms_debug.cpp">
+			<Option target="run"/>
+		</Unit>
+		<Unit filename="/home/tk/Desktop/rm2022_cidp_vision/camera/hikvision/tool/src/fileOperation/fileOperation.cpp">
+			<Option target="run"/>
+		</Unit>
+		<Unit filename="/home/tk/Desktop/rm2022_cidp_vision/energy/src/energy/calibrate/split.cpp">
+			<Option target="run"/>
+		</Unit>
+		<Unit filename="/home/tk/Desktop/rm2022_cidp_vision/energy/src/energy/calibrate/structing.cpp">
+			<Option target="run"/>
+		</Unit>
+		<Unit filename="/home/tk/Desktop/rm2022_cidp_vision/energy/src/energy/change/mode_change.cpp">
+			<Option target="run"/>
+		</Unit>
+		<Unit filename="/home/tk/Desktop/rm2022_cidp_vision/energy/src/energy/change/multiple_mode.cpp">
+			<Option target="run"/>
+		</Unit>
+		<Unit filename="/home/tk/Desktop/rm2022_cidp_vision/energy/src/energy/change/target_change.cpp">
+			<Option target="run"/>
+		</Unit>
+		<Unit filename="/home/tk/Desktop/rm2022_cidp_vision/energy/src/energy/clear/clear.cpp">
+			<Option target="run"/>
+		</Unit>
+		<Unit filename="/home/tk/Desktop/rm2022_cidp_vision/energy/src/energy/clear/energy_init.cpp">
+			<Option target="run"/>
+		</Unit>
+		<Unit filename="/home/tk/Desktop/rm2022_cidp_vision/energy/src/energy/energy.cpp">
+			<Option target="run"/>
+		</Unit>
+		<Unit filename="/home/tk/Desktop/rm2022_cidp_vision/energy/src/energy/find/energy_finder.cpp">
+			<Option target="run"/>
+		</Unit>
+		<Unit filename="/home/tk/Desktop/rm2022_cidp_vision/energy/src/energy/find/target_finder.cpp">
+			<Option target="run"/>
+		</Unit>
+		<Unit filename="/home/tk/Desktop/rm2022_cidp_vision/energy/src/energy/get/get_aim_point.cpp">
+			<Option target="run"/>
+		</Unit>
+		<Unit filename="/home/tk/Desktop/rm2022_cidp_vision/energy/src/energy/get/get_center.cpp">
+			<Option target="run"/>
+		</Unit>
+		<Unit filename="/home/tk/Desktop/rm2022_cidp_vision/energy/src/energy/get/get_guess_point.cpp">
+			<Option target="run"/>
+		</Unit>
+		<Unit filename="/home/tk/Desktop/rm2022_cidp_vision/energy/src/energy/get/get_polar_angle.cpp">
+			<Option target="run"/>
+		</Unit>
+		<Unit filename="/home/tk/Desktop/rm2022_cidp_vision/energy/src/energy/get/get_predict_point.cpp">
+			<Option target="run"/>
+		</Unit>
+		<Unit filename="/home/tk/Desktop/rm2022_cidp_vision/energy/src/energy/judge/judge_contour.cpp">
+			<Option target="run"/>
+		</Unit>
+		<Unit filename="/home/tk/Desktop/rm2022_cidp_vision/energy/src/energy/judge/judge_mode.cpp">
+			<Option target="run"/>
+		</Unit>
+		<Unit filename="/home/tk/Desktop/rm2022_cidp_vision/energy/src/energy/judge/judge_shoot.cpp">
+			<Option target="run"/>
+		</Unit>
+		<Unit filename="/home/tk/Desktop/rm2022_cidp_vision/energy/src/energy/judge/judge_time.cpp">
+			<Option target="run"/>
+		</Unit>
+		<Unit filename="/home/tk/Desktop/rm2022_cidp_vision/energy/src/energy/mark/mark.cpp">
+			<Option target="run"/>
+		</Unit>
+		<Unit filename="/home/tk/Desktop/rm2022_cidp_vision/energy/src/energy/run.cpp">
+			<Option target="run"/>
+		</Unit>
+		<Unit filename="/home/tk/Desktop/rm2022_cidp_vision/energy/src/energy/send/send.cpp">
+			<Option target="run"/>
+		</Unit>
+		<Unit filename="/home/tk/Desktop/rm2022_cidp_vision/energy/src/energy/show/show.cpp">
+			<Option target="run"/>
+		</Unit>
+		<Unit filename="/home/tk/Desktop/rm2022_cidp_vision/energy/src/energy/tool/tool.cpp">
+			<Option target="run"/>
+		</Unit>
+		<Unit filename="/home/tk/Desktop/rm2022_cidp_vision/main.cpp">
+			<Option target="run"/>
+		</Unit>
+		<Unit filename="/home/tk/Desktop/rm2022_cidp_vision/others/src/additions.cpp">
+			<Option target="run"/>
+		</Unit>
+		<Unit filename="/home/tk/Desktop/rm2022_cidp_vision/others/src/camera/camera_wrapper.cpp">
+			<Option target="run"/>
+		</Unit>
+		<Unit filename="/home/tk/Desktop/rm2022_cidp_vision/others/src/camera/video_wrapper.cpp">
+			<Option target="run"/>
+		</Unit>
+		<Unit filename="/home/tk/Desktop/rm2022_cidp_vision/others/src/options.cpp">
+			<Option target="run"/>
+		</Unit>
+		<Unit filename="/home/tk/Desktop/rm2022_cidp_vision/others/src/serial.cpp">
+			<Option target="run"/>
+		</Unit>
+		<Unit filename="/home/tk/Desktop/rm2022_cidp_vision/others/src/systime.cpp">
+			<Option target="run"/>
+		</Unit>
+		<Unit filename="/home/tk/Desktop/rm2022_cidp_vision/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+		<Unit filename="/home/tk/Desktop/rm2022_cidp_vision/../../../../usr/lib/cmake/eigen3/Eigen3Config.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\usr\lib\cmake\eigen3\"/>
+		</Unit>
+		<Unit filename="/home/tk/Desktop/rm2022_cidp_vision/../../../../usr/lib/cmake/eigen3/Eigen3ConfigVersion.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\usr\lib\cmake\eigen3\"/>
+		</Unit>
+		<Unit filename="/home/tk/Desktop/rm2022_cidp_vision/../../../../usr/lib/cmake/eigen3/Eigen3Targets.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\usr\lib\cmake\eigen3\"/>
+		</Unit>
+		<Unit filename="/home/tk/Desktop/rm2022_cidp_vision/../../../../usr/local/lib/cmake/opencv4/OpenCVConfig-version.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\usr\local\lib\cmake\opencv4\"/>
+		</Unit>
+		<Unit filename="/home/tk/Desktop/rm2022_cidp_vision/../../../../usr/local/lib/cmake/opencv4/OpenCVConfig.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\usr\local\lib\cmake\opencv4\"/>
+		</Unit>
+		<Unit filename="/home/tk/Desktop/rm2022_cidp_vision/../../../../usr/local/lib/cmake/opencv4/OpenCVModules-release.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\usr\local\lib\cmake\opencv4\"/>
+		</Unit>
+		<Unit filename="/home/tk/Desktop/rm2022_cidp_vision/../../../../usr/local/lib/cmake/opencv4/OpenCVModules.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\usr\local\lib\cmake\opencv4\"/>
+		</Unit>
+	</Project>
+</CodeBlocks_project_file>
