@@ -9,6 +9,7 @@
 #include <serial.h>
 #include <armor_finder/classifier/classifier.h>
 #include <additions.h>
+#include <opencv2/dnn/dnn.hpp>
 
 #define BLOB_RED    ENEMY_RED
 #define BLOB_BLUE   ENEMY_BLUE
@@ -129,6 +130,13 @@ private:
     void antiTop();                                     // 反小陀螺
     bool sendBoxPosition(uint16_t shoot);               // 和主控板通讯
     bool target_solving();                              // 目标解算
+
+
+    int doClassify(cv::Mat &image);   // 君佬的分类器
+    double threshold;
+    cv::dnn::Net net_;
+    std::vector<char> class_names_;
+    void InitClass(const std::string & model_path, const std::string & label_path, const double threshold);
 
 public:
     void run(cv::Mat &src);                             // 自瞄主函数

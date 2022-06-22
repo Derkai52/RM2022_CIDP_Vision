@@ -5,6 +5,8 @@
 
 #define DO_NOT_CNT_TIME
 #include <log.h>
+#include <opencv2/dnn/dnn.hpp>
+#include <fstream>
 
 // 判断两个灯条的角度差
 static bool angelJudge(const LightBlob &light_blob_i, const LightBlob &light_blob_j) {
@@ -109,6 +111,72 @@ bool ArmorFinder::matchArmorBoxes(const cv::Mat &src, const LightBlobs &light_bl
     return !armor_boxes.empty();
 }
 
+void ArmorFinder::InitClass(const std::string & model_path, const std::string & label_path, const double thre)
+{
+    net_ = cv::dnn::readNetFromONNX(model_path);
+
+    std::ifstream label_file(label_path);
+    std::string line;
+    while (std::getline(label_file, line)) {
+        class_names_.push_back(line[0]);
+    }
+}
+
+
+
+int ArmorFinder::doClassify(cv::Mat &image)
+{
+        // Normalize
+        image = image / 255.0;
+
+        // Create blob from image
+        cv::Mat blob;
+        cv::dnn::blobFromImage(image, blob, 1., cv::Size(28, 20));
+
+        // Set the input blob for the neural network
+        net_.setInput(blob);
+        // Forward pass the image blob through the model
+        cv::Mat outputs = net_.forward();
+
+        // Do softmax
+        float max_prob = *std::max_element(outputs.begin<float>(), outputs.end<float>());
+        cv::Mat softmax_prob;
+        cv::exp(outputs - max_prob, softmax_prob);
+        float sum = static_cast<float>(cv::sum(softmax_prob)[0]);
+        softmax_prob /= sum;
+
+        double confidence;
+        cv::Point class_id_point;
+        minMaxLoc(softmax_prob.reshape(1, 1), nullptr, &confidence, nullptr, &class_id_point);
+        int label_id = class_id_point.x;
+        return label_id;
+//        armor.number = class_names_[label_id];
+//
+//        std::stringstream result_ss;
+//        result_ss << armor.number << ":_" << std::fixed << std::setprecision(1)
+//                  << armor.confidence * 100.0 << "%";
+//        armor.classfication_result = result_ss.str();
+//
+//    armors.erase(
+//            std::remove_if(
+//                    armors.begin(), armors.end(),
+//                    [this](const Armor & armor) {
+//                        if (armor.confidence < threshold || armor.number == 'N') {
+//                            return true;
+//                        }
+//
+//                        bool mismatch = false;
+//                        if (armor.armor_type == LARGE) {
+//                            mismatch = armor.number == 'O' || armor.number == '2' || armor.number == '3' ||
+//                                       armor.number == '4' || armor.number == '5';
+//                        } else if (armor.armor_type == SMALL) {
+//                            mismatch = armor.number == '1' || armor.number == 'B' || armor.number == 'G';
+//                        }
+//                        return mismatch;
+//                    }),
+//            armors.end());
+}
+
 // 在给定的图像上寻找装甲板
 bool ArmorFinder::findArmorBox(const cv::Mat &src, ArmorBox &box) {
     LightBlobs light_blobs; // 存储所有可能的灯条
@@ -139,18 +207,43 @@ bool ArmorFinder::findArmorBox(const cv::Mat &src, ArmorBox &box) {
     }
 // 如果分类器可用，则使用分类器对装甲板候选区进行筛选
     if (classifier) {
-        CNT_TIME("classify: %d", {
-            for (auto &armor_box : armor_boxes) {
-                cv::Mat roi = src(armor_box.rect).clone();
-                cv::resize(roi, roi, cv::Size(48, 36));
-                int c = classifier(roi);
-                if (c == RED2 || c == BLUE2){ // TODO : Warning  这里强行不识别工程
-                    c = 0;
-                }
-                armor_box.id = c;
+        const int light_length = 12;
+        const int warp_height = 28;
+        const int small_armor_width = 32;
+
+        for (auto &armor_box : armor_boxes) {
+            armor_box.getFourPoint(armor_box);
+            cv::Point lb = cv::Point(armor_box.four_point[1]); // 左下
+            cv::Point lt = cv::Point(armor_box.four_point[0]); // 左上
+            cv::Point rt = cv::Point(armor_box.four_point[3]); // 右上
+            cv::Point rb = cv::Point(armor_box.four_point[2]); // 右下
+            // Warp perspective transform
+
+            cv::Point2f lights_vertices[4] = {rb,rt,lt,lb};
+
+            const int top_light_y = (warp_height - light_length) / 2 - 1;
+            const int bottom_light_y = top_light_y + light_length;
+            const int warp_width = small_armor_width;
+            cv::Point2f target_vertices[4] = {
+                    cv::Point(0, bottom_light_y),
+                    cv::Point(0, top_light_y),
+                    cv::Point(warp_width - 1, top_light_y),
+                    cv::Point(warp_width - 1, bottom_light_y),
+            };
+            cv::Mat number_image;
+            auto rotation_matrix = cv::getPerspectiveTransform(lights_vertices, target_vertices);
+            cv::warpPerspective(src, number_image, rotation_matrix, cv::Size(warp_width, warp_height));
+            cv::resize(number_image, number_image, cv::Size(48, 36));
+            cv::imshow("warp", number_image);
+
+            int c = classifier(number_image);
+            if (c == RED2 || c == BLUE2){ // TODO : Warning  这里强行不识别工程
+                c = 0;
             }
-        }, armor_boxes.size());
-// 按照优先级对装甲板进行排序
+            armor_box.id = c;
+        }
+
+        // 按照优先级对装甲板进行排序
         sort(armor_boxes.begin(), armor_boxes.end(), [&](const ArmorBox &a, const ArmorBox &b) {
             if (last_box.rect != cv::Rect2d()) {
                 return getPointLength(a.getCenter() - last_box.getCenter()) <

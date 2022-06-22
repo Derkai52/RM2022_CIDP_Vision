@@ -76,9 +76,10 @@ int main(int argc, char *argv[]) {
         mcu_data.enemy_color = ENEMY_RED;
     else
         mcu_data.enemy_color = ENEMY_BLUE;
+//    mcu_data.enemy_color = ENEMY_BLUE;
 
     // 根据条件输入选择视频源 (1、海康相机  0、视频文件)
-    int from_camera = 1; // 默认视频源
+    int from_camera = 0; // 默认视频源
 //    if (!run_with_camera) {
 //        cout << "输入 1 使用海康相机, 输入 0 运行视频" << endl;
 //        cin >> from_camera;
