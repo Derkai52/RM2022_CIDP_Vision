@@ -235,13 +235,10 @@ bool ArmorFinder::findArmorBox(const cv::Mat &src, ArmorBox &box) {
             cv::warpPerspective(src, number_image, rotation_matrix, cv::Size(warp_width, warp_height));
             cv::resize(number_image, number_image, cv::Size(48, 36));
             cv::imshow("warp", number_image);
-
-            cv::Mat roi;
-            cv::resize(src, roi, cv::Size(48, 36));
-
-//            int c = classifier(number_image);
-            cv::imshow("roi", roi);
-            int c = classifier(roi);
+            int c = classifier(number_image);
+//            cv::Mat roi = src(armor_box.rect).clone();
+//            cv::resize(roi, roi, cv::Size(48, 36));
+//            cv::imshow("roi", roi);
             if (c == RED2 || c == BLUE2){ // TODO : Warning  这里强行不识别工程
                 c = 0;
             }
