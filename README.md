@@ -27,7 +27,8 @@
 光照不足时，调整摄像头曝光或增益数值，直到数字清晰可见。如有需要可针对实际环境情况调整白平衡。
 
 ### 3、功能演示
-![自瞄击打哨兵](doc/resource/readme_doc/attack_test1.gif)
+![自瞄击打哨兵1](doc/resource/readme_doc/attack_test1.gif)
+![自瞄击打哨兵2](doc/resource/readme_doc/attack_test4.gif)
 ![自瞄击打移动机器人](doc/resource/readme_doc/attack_test2.gif)
 ![自瞄击打大能量机关](doc/resource/readme_doc/attack_test3.gif)
 
