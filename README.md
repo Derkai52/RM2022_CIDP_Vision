@@ -7,7 +7,7 @@
 
 ## 一、项目说明
 ### 自瞄装甲板识别
-![自瞄](doc/resource/readme_doc/autoaim.png)
+![可视化示例](doc/resource/readme_doc/autoaim.png)
 
 ### 1、测试用例
 
@@ -28,8 +28,8 @@
 
 ### 3、功能演示
 ![自瞄击打哨兵](doc/resource/readme_doc/attack_test1.gif)
-![自瞄击打](doc/resource/readme_doc/attack_test2.gif)
-![自瞄击打哨兵](doc/resource/readme_doc/attack_test3.gif)
+![自瞄击打移动机器人](doc/resource/readme_doc/attack_test2.gif)
+![自瞄击打大能量机关](doc/resource/readme_doc/attack_test3.gif)
 
 ## 二、项目相关文档
 
