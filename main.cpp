@@ -124,8 +124,8 @@ int main(int argc, char *argv[]) {
 //            usleep(sleep_time); // ms
         }
 
-        //        char curr_state = mcu_data.state; // # TODO:记得改回来！
-        char curr_state = ARMOR_STATE;
+        //  char curr_state = mcu_data.state; // # 下位机控制模式
+        char curr_state = ARMOR_STATE; // 固定模式
         CNT_TIME("Total", {
             if (curr_state != ARMOR_STATE) {  // 能量机关模式
                 DebugT(1, 1,"目标颜色:" << (int)mcu_data.enemy_color << " 图像源:"<< from_camera<< " 当前模式: 能量机关" ); // 右边
